@@ -191,6 +191,38 @@ def get_articles_nytimes(links_collection, articles_collection,link_url_field = 
 
 
 
+def add_title_to_links(links_collection):
+	'''
+	add filed 'title' to collection links in db nytimes
+	'''
+
+	field_name = 'title'
+	query = {field_name:{'$exists': 0}}
+	docs_no_title = links_collection.find(query)
+
+	#print '%d docs to update' % len(docs_no_titles)
+	for doc in docs_no_title: 	
+		#url = doc[link_url_field_default]
+		doc_id = doc['_id']
+		title = doc['headline'].get("print_headline",'')
+		if len(title)<5:
+			title = doc['headline'].get("main",'')
+		links_collection.update({'_id': doc_id}, {'$set': {field_name: title}})
+
+def add_url_to_links(links_collection):
+	'''
+	added field url to all links documents
+	'''
+
+	field_name = 'url'
+	query = {field_name:{'$exists': 0}}
+	docs_no_url = links_collection.find(query)
+
+	#print '%d docs to update' % len(docs_no_url)
+	for doc in docs_no_url: 	
+		url = doc[link_url_field_default]
+		doc_id = doc['_id']
+		links_collection.update({'_id': doc_id}, {'$set': {field_name: url}})
 
 
 

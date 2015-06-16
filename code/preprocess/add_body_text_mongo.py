@@ -1,7 +1,7 @@
 '''
 extract main text from html and added in mongodb 
-collection articles 
-field 'body_text'
+
+field 'body_text' collection 'articles'
 
 to-do:
 is it necessary to try other extraction methods and why?
