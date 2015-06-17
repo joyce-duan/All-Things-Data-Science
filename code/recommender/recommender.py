@@ -27,6 +27,22 @@ def get_rating(good_urls, meh_urls, df2):
 print get_rating(good_urls, meh_urls, df2)    
 
 
+def run_article_recom():
+    '''
+    test run of article recommendations
+    '''
+ 
+    good_urls = ['http://www.bloomberg.com/news/articles/2015-06-04/help-wanted-black-belts-in-data', 
+            'http://bits.blogs.nytimes.com/2015/04/28/less-noise-but-more-money-in-data-science/'
+           , 'http://bits.blogs.nytimes.com/2013/06/19/sizing-up-big-data-broadening-beyond-the-internet/'
+           ]
+    meh_urls = ['http://bits.blogs.nytimes.com/2013/04/11/education-life-teaching-the-techies/' # too short, no content
+    , 'http://www.nytimes.com/2013/04/14/education/edlife/universities-offer-courses-in-a-hot-new-field-data-science.html'  
+    ]
 
-  
-def get_df_recommender
+    rating_content = get_rating(good_urls, meh_urls, df2)  
+    rating_vec = np.zeros(df2.shape[0])
+    for row in rating_content:
+        rating_vec[row[0]] =  row[1]
+    print rating_content
+    print [i for i in xrange(len(rating_vec)) if rating_vec[i]>0]

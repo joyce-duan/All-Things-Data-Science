@@ -69,38 +69,40 @@ def get_articles(links_collection, articles_collection, link_url_field = link_ur
 	print '%i urls found to get content after updating' % (len(urls_no_content))
 	t0 = time.time()
 
-	for url in urls_no_content:#: #[:5]:  # for Testing
+	for url in urls_no_content[1:]:#: #[:5]:  # for Testing
 
 		counter += 1
+		url = url.strip()
 
-		if  'https://web.archive.orgitem?i' in url:
+		if  'https://web.archive.orgitem?i' in url or url[-4:] == '.pdf':
 			pass
 		else:
-			response = single_query(url)
-			if response:
-				#soup = BeautifulSoup(response.text, 'html.parser')
-				try:
-					articles_collection.insert( {'url':url, 'raw_html':response.text} )
-					counter_inserted += 1
-					#print response.text
-				except DuplicateKeyError:
-					print 'duplicate keys'
+			print 'url: %s' % url
+			if 'web.archive.org' in url:
+				url_new = '/'.join(re.split('\d{8}',url)[1].split('/')[1:])
+				response = single_query(url_new)		
+				if response:
+					#soup = BeautifulSoup(response.text, 'html.parser')
+					try:
+						print 'try insert %s  %d' % (url_new, len(response.text))
+						articles_collection.insert( {'url':url, 'raw_html':response.text} )
+						counter_inserted += 1
+						#print response.text
+					except DuplicateKeyError:
+						print 'duplicate keys'
+					links_collection.update({'url': url}, {'$set': {'gothtml': 1}}, multi = True)
 
-				links_collection.update({'url': url}, {'$set': {'gothtml': 1}}, multi = True)
-
-			else:
-				if 'web.archive.org' in url:
-					url_new = '/'.join(re.split('\d{8}',url)[1].split('/')[1:])
-					response = single_query(url_new)		
+				else:
+					response = single_query(url)
 					if response:
 						#soup = BeautifulSoup(response.text, 'html.parser')
 						try:
+							print 'try insert %s  %d' % (url, len(response.text))
 							articles_collection.insert( {'url':url, 'raw_html':response.text} )
 							counter_inserted += 1
 							#print response.text
 						except DuplicateKeyError:
 							print 'duplicate keys'
-
 						links_collection.update({'url': url}, {'$set': {'gothtml': 1}}, multi = True)
 
 		links_collection.update({'url': url}, {'$set': {'triedhtml': 1}}, multi = True)

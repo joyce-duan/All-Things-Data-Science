@@ -1,12 +1,17 @@
+'''
+ItemItem simiarity based collaborative filtering usein cosine_similairty of TFIDF 
+
+modified from example code of recommendation system module zipfian dsi program 
+'''
+
 import numpy as np
 import pandas as pd
 from scipy import sparse
 from sklearn.metrics.pairwise import cosine_similarity
 from time import time
 from sklearn.metrics.pairwise import linear_kernel
-'''
-modified from example code of recommendation system module zipfian dsi program 
-'''
+import pickle
+
 
 class ItemItemRec(object):
     '''
@@ -156,9 +161,67 @@ def get_item_feature_data():
     '''
     pass
 
+def make_df_predictions(rating_predict, relevant_items_all, my_rec_engine, df2):
+    '''
+    make prediction and the relevant information into dataframe
+        - OUTPUT: 
+            df_recom: dataframe of predicted rating for top k articles
+            relevant_all: evidence for the predition list of relevant items/articles and similarity and user score
+                relevant_all index is the same as iloc of df_recom
 
+
+
+    rating_predict, relevant_items_all = my_rec_engine.pred_one_user_from_rating (rating_content, report_run_time=False)
     
-if __name__ == "__main__":
+
+    '''
+    recommed_articles = []
+    relevant_all = []
+
+    for i_article in np.argsort(-1.0*rating_predict)[:3]:
+        r= {}
+        #i_article = 602
+        relevant_items = relevant_items_all[i_article]
+        sim_vec = my_rec_engine.item_sim_mat[i_article,:].flatten()#, relevant_items] 
+        r['score'] = rating_predict[i_article]
+        r['title'] = df2.iloc[i_article]['title']
+        r['body_text']=df2.iloc[i_article]['body_text']
+        r['url'] = df2.iloc[i_article]['url']
+
+        recommed_articles.append(r)
+        
+        relevent = []
+        for i_revelent in relevant_items:
+            rele = {}
+            rele['rating'] =  rating_vec[i_revelent]
+            rele['sim'] = sim_vec[i_revelent]
+            rele['title'] = df2.iloc[i_revelent]['title']
+            rele['body_text']=df2.iloc[i_revelent]['body_text']
+            rele['url'] = df2.iloc[i_revelent]['url']
+            rele['i'] = i_revelent
+            relevent.append(rele)
+        df_relevant = pd.DataFrame(relevent)
+        relevant_all.append(df_relevant)
+        
+    df_recom = pd.DataFrame(recommed_articles)
+
+    print df_recom.head()
+    print '-------'
+    print relevant_all
+
+    return df_recom, relevant_all 
+
+
+
+def dump_pickle_df_prediction(df_recom, relevant_all):
+    pickle.dump(df_recom,open('df_recom.pkl','w'))
+    pickle.dump(relevant_all,open('relevant_all.pkl','w'))
+
+
+   
+
+
+def run_movie_recom():
     ratings_data_contents, ratings_mat = get_ratings_data()
     my_rec_engine = ItemItemRec(neighborhood_size=75)
     my_rec_engine.fit(ratings_mat)
@@ -168,3 +231,7 @@ if __name__ == "__main__":
     print(user_1_preds[:100])
     print(my_rec_engine.top_n_recs(2, 20))
 
+
+if __name__ == "__main__":
+
+    run_movie_rating()
