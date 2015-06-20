@@ -18,6 +18,7 @@ from pymongo import MongoClient
 from bs4 import BeautifulSoup
 import time
 from pymongo.errors import DuplicateKeyError, CollectionInvalid
+import re
 
 class MyMongo(object):
 	'''
@@ -32,7 +33,7 @@ class MyMongo(object):
 		if self.dbname == 'nytimes':
 			self.link_url_field_name = 'web_url'
 
-		print self.dbname, self.links_collection_name 
+		print 'connected to database %s, collection name: %s ' % (self.dbname, self.links_collection_name)
 
 		self.client = MongoClient()
 		self.db = self.client[self.dbname]
@@ -82,21 +83,34 @@ class MyMongo(object):
 
 	def get_article_attri(self, testing = 0):
 		'''
-		get the attributes of article by url
+		get the attributes of article by cleaned_url
 			- INPUT:
 			- OUTPUT:  dictionary: article_dict[url] = (title)
 		'''
 
 		query = {self.link_url_field_name :{'$exists':1}, 'title':{'$exists':1}}
-		projection = {"_id": 0, 'title': 1, self.link_url_field_name :1}
+		projection = {"_id": 0, 'title': 1, self.link_url_field_name :1, 'dt':1}
 		if testing:
 			links = self.links_collection.find(query, projection, limit = 25)
 		else:
 			links = self.links_collection.find(query, projection)
 		article_dict = {}
+		article_dt = {}
 		for link in list(links):
-			article_dict[link[self.link_url_field_name]] = link['title']
-		return article_dict
+			url = link[self.link_url_field_name]
+			if 'https://web.archive.orgitem?id' in url: #=1515
+				pass
+			elif 'web.archive.org' in url:
+				#print url
+				url = '/'.join(re.split('\d{8}',url)[1].split('/')[1:])
+				url = url.strip()
+			article_dict[url] = link['title']
+			try: 
+				t = link['dt']
+			except:
+				t = ''
+			article_dt[url] = link.get('dt', t)
+		return article_dict, article_dt
 
 
 

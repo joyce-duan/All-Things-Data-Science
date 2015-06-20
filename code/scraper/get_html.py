@@ -134,8 +134,9 @@ def extract_urls(fname, dir_name):
 
 	return links
 
-def insert_links(links_collection, links, subsource, linksourceversion):
+def insert_links(links_collection, links, subsource, linksourceversion): # use Scraper.py instead
 	'''
+	depreciated
 	insert datatau entries into mongodb links collection
 
 	'''

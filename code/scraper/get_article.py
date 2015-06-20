@@ -14,10 +14,13 @@ request error code:
 	404 not found
 
 to-do:
+-1. flag invalid_url 
 1. uri vsl response code error; exclude those with too many errors?
 2. wget seemed to be work with some of these??
 '''
 from get_links import get_mongodb_collections
+from mechanize import Browser
+import mechanize
 
 link_query = {'gothtml':{'$exists': 0}, 'org':{'$ne': 'datatau'}}
 link_url_field_default = 'url'
@@ -69,41 +72,54 @@ def get_articles(links_collection, articles_collection, link_url_field = link_ur
 	print '%i urls found to get content after updating' % (len(urls_no_content))
 	t0 = time.time()
 
-	for url in urls_no_content[1:]:#: #[:5]:  # for Testing
+	for url in urls_no_content:#[:5]: # for Testing
 
 		counter += 1
 		url = url.strip()
-
-		if  'https://web.archive.orgitem?i' in url or url[-4:] == '.pdf':
+		raw_html = ''
+		url_orig = url
+		# ignore these url
+		if  'https://web.archive.orgitem?i' in url or url[-4:] == '.pdf' or url[:4] == 'item':
 			pass
 		else:
 			print 'url: %s' % url
+			# wayback machine try original url first, then use wayback machine 
 			if 'web.archive.org' in url:
-				url_new = '/'.join(re.split('\d{8}',url)[1].split('/')[1:])
-				response = single_query(url_new)		
+				url_orig= '/'.join(re.split('\d{8}',url)[1].split('/')[1:])
+				raw_html = singel_query_raw_html_all_methods(url_orig)
+				if len(raw_html) > 100:
+					pass
+				else:
+					raw_html = singel_query_raw_html_all_methods(url)
+				#response = single_query(url_new)	
+			else:
+				raw_html = singel_query_raw_html_all_methods(url)
+
+			#if response:
+			if len(raw_html) > 100:
+				#soup = BeautifulSoup(response.text, 'html.parser')
+				try:
+					print 'try insert %s  length: %d' % (url_orig, len(raw_html))
+					articles_collection.insert( {'url':url_orig, 'raw_html':raw_html} )
+					counter_inserted += 1
+					#print response.text
+				except DuplicateKeyError:
+					print 'duplicate keys'
+				links_collection.update({'url': url}, {'$set': {'gothtml': 1}}, multi = True)
+			'''
+			else:
+				response = single_query(url)
 				if response:
 					#soup = BeautifulSoup(response.text, 'html.parser')
 					try:
-						print 'try insert %s  %d' % (url_new, len(response.text))
+						print 'try insert %s  %d' % (url, len(response.text))
 						articles_collection.insert( {'url':url, 'raw_html':response.text} )
 						counter_inserted += 1
 						#print response.text
 					except DuplicateKeyError:
 						print 'duplicate keys'
 					links_collection.update({'url': url}, {'$set': {'gothtml': 1}}, multi = True)
-
-				else:
-					response = single_query(url)
-					if response:
-						#soup = BeautifulSoup(response.text, 'html.parser')
-						try:
-							print 'try insert %s  %d' % (url, len(response.text))
-							articles_collection.insert( {'url':url, 'raw_html':response.text} )
-							counter_inserted += 1
-							#print response.text
-						except DuplicateKeyError:
-							print 'duplicate keys'
-						links_collection.update({'url': url}, {'$set': {'gothtml': 1}}, multi = True)
+			'''
 
 		links_collection.update({'url': url}, {'$set': {'triedhtml': 1}}, multi = True)
 		if counter % 10 == 0:
@@ -115,19 +131,69 @@ def get_articles(links_collection, articles_collection, link_url_field = link_ur
 		time.sleep(2)
 	print '%i urls processed, %i records inserted' % (counter, counter_inserted)
 
+def singel_query_raw_html_all_methods(url):
+	'''
+	try all the methods to get raw_html
+		- INPUT: url string
+		- OUTPUT: raw_html '' if none found
+	'''
+	response = single_query(url)
+	
+	raw_html = ''
+	if response:
+		if response.status_code == 403:
+			#try:
+			raw_html = single_query_browser(url)
+			#except:
+			#	pass
+		else:
+			if response.status_code == 200:
+				raw_html = response.text
+	return raw_html
+
 def single_query(url):
+	'''
+	INPUT:  
+		- url   string
+	OUTPUT:
+		- response object
+	'''
 	#response = None
 	try:
 		response = requests.get(url)
 		if response.status_code != 200:
 			print 'WARNING', url,' ', response.status_code
+			return response
 		else:
 			return response  # 
 	except:
 		print 'invalid url:',  url
 
 
+def single_query_browser(url):
+	'''
+	as plan b, use mechanize to get html content of an url
+	use this if single_query gave response.status_code 403
+	INPUT:  
+		- url   string
+	OUTPUT:
+		- raw_html   string
+	'''
+	#url = 'http://blog.treasuredata.com/blog/2015/04/24/python-for-aspiring-data-nerds/'
 
+	br = mechanize.Browser()
+	#br.set_all_readonly(False)    # allow everything to be written to
+	br.set_handle_robots(False)   # ignore robots
+	br.set_handle_refresh(False)  # can sometimes hang without this
+	br.addheaders =  [('User-agent', 'Firefox')]           # [('User-agent', 'Firefox')]
+	#try:
+	response = br.open(url)
+	#print response.read()      # the text of the page
+	response1 = br.response()  # get the response again
+	raw_html = response1.read()     # can apply lxml.html.fromstring()
+
+	return raw_html
+	#print raw_html[:300]
 
 if __name__ == '__main__':
 	mongo_client = MongoClient()
@@ -137,5 +203,7 @@ if __name__ == '__main__':
 
 	# db.links.find({gothtml:{$exists:0},org:{$ne:'datatau'},triedhtml:{$exists:0}}).count()
 	#db.links.distinct('url',{gothtml:{$exists:0},org:{$ne:'datatau'},triedhtml:{$exists:0}})
-	q =  {'gothtml':{'$exists': 0}, 'org':{'$ne': 'datatau'}, 'triedhtml':{'$exists':0}, 'org':{'$ne':'datatau.com'}}
+	q =  {'gothtml':{'$exists': 0}, 'org':{'$ne': 'datatau'}, 'triedhtml':{'$exists':0}}#, 'org':{'$ne':'datatau.com'}}
+	#q =  {'gothtml':{'$exists': 0}, 'org':{'$ne': 'datatau'}} #, 'org':{'$ne':'datatau.com'}}
+
 	get_articles(links_collection, articles_collection, link_url_field = link_url_field_default, query = q)

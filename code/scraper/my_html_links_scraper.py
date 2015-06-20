@@ -31,8 +31,9 @@ def get_links(fname):
 		links.append([('url',a['href']), ('title',a.text)])
 	return links
 
-def insert_links(links_collection, links, linksource=linksource):#, subsource, linksourceversion):
+def insert_links(links_collection, links, linksource=linksource):#use Scraper.py. this depreciated, subsource, linksourceversion):
 	'''
+	use Scraper.py instead
 	base version of insert links attributes = ['url','title', 'linksource']
 	insert datatau entries into mongodb links collection
 

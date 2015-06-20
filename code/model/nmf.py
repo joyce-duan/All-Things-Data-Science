@@ -2,7 +2,7 @@ from sklearn.decomposition import NMF
 import numpy as np
 import pickle
 
-def run_nmf(X, n_topics=20, **kwargs):
+def run_nmf(X, **kwargs):
     '''
     NMF on the TF-IDF feature matrix to create a topic model.
         - INPUT:  
@@ -13,7 +13,10 @@ def run_nmf(X, n_topics=20, **kwargs):
              W (Article-Topic matrix):2d numpy array
             H (Topic-Term matrix): 2d numpy array 
     '''
-    nmf = NMF(n_components=n_topics, **kwargs)
+    if 'n_components' in kwargs:
+        pass
+    else: kwargs['n_components'] = 20
+    nmf = NMF(**kwargs)
     W = nmf.fit_transform(X)
     H = nmf.components_
     return W, H, nmf
@@ -57,7 +60,10 @@ def get_top_topics_terms(vectorizer, H, k_top_words=50):
     '''
     get the k_top_words for each topic
         - INPUT:  
-        - OUTPUT: dict - topics_dicts (most important terms for each topic)
+            - vectorizer:  used to get feature names
+            - H: topics x terms
+        - OUTPUT: list of dictionary 
+                    each element: topics_dicts   word:weight  (k_top_words most important terms for each topic)
     '''
     topic_terms = []
     n_topics = H.shape[0]

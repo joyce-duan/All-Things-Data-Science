@@ -7,7 +7,7 @@ from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 from cStringIO import StringIO
-
+import os
 def convert_pdf_to_txt(path):
     rsrcmgr = PDFResourceManager()
     retstr = StringIO()
@@ -29,6 +29,15 @@ def convert_pdf_to_txt(path):
     return str
 
 if __name__ == '__main__':
-    fname = '/Users/joyceduan/data/slack/06-04.pdf'
-    txt = convert_pdf_to_txt(fname)
-    print txt
+    #fname = '/Users/joyceduan/data/slack/06-04.pdf'
+    mydirectory = '/Users/joyceduan/data/slack/'
+    #mydirectory = '/Users/joyceduan/documents/git/All-Things-Data-Science/code/data/'
+    fnames = os.listdir(mydirectory)
+    for fname in fnames:
+        if fname[-4:] == '.pdf':
+            fname_full = mydirectory + fname
+            print fname_full
+            txt = convert_pdf_to_txt(fname_full)
+            out_fname = fname.replace('.pdf','.txt')
+            with open(out_fname, 'w') as out_fh:
+                out_fh.write(txt+"\n")

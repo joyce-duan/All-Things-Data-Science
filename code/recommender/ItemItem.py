@@ -168,12 +168,7 @@ def make_df_predictions(rating_predict, relevant_items_all, my_rec_engine, df2):
             df_recom: dataframe of predicted rating for top k articles
             relevant_all: evidence for the predition list of relevant items/articles and similarity and user score
                 relevant_all index is the same as iloc of df_recom
-
-
-
     rating_predict, relevant_items_all = my_rec_engine.pred_one_user_from_rating (rating_content, report_run_time=False)
-    
-
     '''
     recommed_articles = []
     relevant_all = []
@@ -211,15 +206,9 @@ def make_df_predictions(rating_predict, relevant_items_all, my_rec_engine, df2):
 
     return df_recom, relevant_all 
 
-
-
 def dump_pickle_df_prediction(df_recom, relevant_all):
     pickle.dump(df_recom,open('df_recom.pkl','w'))
     pickle.dump(relevant_all,open('relevant_all.pkl','w'))
-
-
-   
-
 
 def run_movie_recom():
     ratings_data_contents, ratings_mat = get_ratings_data()
