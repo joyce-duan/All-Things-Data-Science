@@ -60,7 +60,7 @@ my_title = '''<html>
 
 # OUR HOME PAGE
 #============================================
-@app.route('/')
+@app.route('/test')
 #  http://localhost:6969/
 def index():
     p_acronym = 'All Things DS'
@@ -70,7 +70,8 @@ def index():
 # Form page to submit text
 #============================================
 # create page with a form on it
-@app.route('/form')
+# /form?
+@app.route('/')
 #  http://localhost:6969/form
 def cool_form():
     action = '/recommender_by_content'
@@ -182,13 +183,23 @@ def recommender_by_ratings():
     return render_template('recom.html', username = username, idx = range(df_recom.shape[0]), \
         df_recom = df_recom, relevant_all=relevant_all)
 
-@app.rout('/topics_trends')
-def topics_trends():
+@app.route('/topic_trends')
+def topic_trends():
     """
     explore topic trends
     """
-    return flask.render_template("topic_trends.html")
+    return render_template("topic_trends.html")
     #return flask.render_template("basic-carousel.html")
+
+@app.route('/browse')
+
+def browse():
+    """
+    explore topic trends
+    """
+    return render_template("browse_mockup.html")
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=6969, debug=True)
