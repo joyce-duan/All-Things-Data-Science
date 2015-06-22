@@ -20,7 +20,6 @@ import os
 import pickle
 #import ipdb
 
-
 from configobj import ConfigObj
 config = ConfigObj('../../allds.config')
 allds_home = config.get('allDS_home', '/Users/joyceduan/Documents/git/All-Things-Data-Science/')
@@ -54,7 +53,8 @@ class Recommender(object):
         t1 = time.time() # time it
         print "finished in  %4.4f %s " %((t1-t0)/60,'loading model\n')
 
-        # load articles
+        # load all articles 
+        # these include newest articles, which may not be used in model_name and related H
         t0 = t1
         df_article_fname = data_home + 'df_articles.pkl'
         W_article_fname = data_home + self.model_name + 'W_articles.pkl'
@@ -78,6 +78,9 @@ class Recommender(object):
         t1 = time.time() # time it
         print 'topics for articles:'
         print "finished in  %4.4f min for %s " %((t1-t0)/60,'topics of articles\n')
+
+    def get_topic_names(self):
+        return self.topic_model.topic_names
 
     def load_articles_from_pickle(self, df_article_fname, W_article_fname, X_article_fname):
         with open(df_article_fname, 'r') as in_fh:

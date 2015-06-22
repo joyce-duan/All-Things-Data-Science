@@ -10,7 +10,6 @@
 <!-- 
 ../static/img/favicon.ico
 -->
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -49,11 +48,19 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">{{ p_acronym }} </a>  <!-- Project name-->
-        </div>
-        <div class="container">  <!--????? -->
-          about 
-        </div>
+            <span class="sr-only">Toggle navigation</span>
+          <!--
+          <a class="navbar-brand" href="#">{{ p_acronym }} </a>  &nbsp; - &nbsp; -->
+          <!-- Project name-->
+        <a class="navbar-brand" href="/form"> Search by Text&nbsp;</a> 
+        <a class="navbar-brand" href="/browse"> Browse  &nbsp;&nbsp;&nbsp;</a>  
+          <a class="navbar-brand" href="/topic_trends"> Trends&nbsp;</a>  
+          <!-- <a class="navbar-brand" href="#"> Trending&nbsp;</a>   -->
+          <a class="navbar-brand" href="#"> GitHub&nbsp;</a>           
+        </div> <!--
+        <div class="container">  
+          
+        </div> -->
           <!-- 
           <form class="navbar-form navbar-right">
             <div class="form-group">
@@ -73,41 +80,34 @@
     <div class="jumbotron">
       <div class="container">
         <h1>  {{ pname_full }} </h1>
-        <p>This is a description about what the project is, and why it matters to me.  What pain points does it solve? What are the targeted audience? </p>
-        <p><a class="btn btn-primary btn-lg" href="/recommender" role="button">Try it Out &raquo;</a></p>
+        <p>This is a description about what the project is, and why it matters to me.  What pain points does it solve? What are the targeted audience? <br>
+        <p>
+
+          <a class="btn btn-primary btn-lg" href="/form" role="button">Search by Text &raquo;</a>
+         &nbsp;&nbsp;&nbsp;&nbsp;
+          <a class="btn btn-primary btn-lg" href="/recommender_by_ratings" role="button">based on Your Ratings &raquo;</a> 
       </div>
     </div>
 
     <div class="container">
       <!-- Example row of columns -->
       <div class="row">
-        <div class="col-md-4">
+       
          <!-- <h2>Heading</h2>-->
           <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
           <!-- 
           <p><a class="btn btn-default" href="#" role="button"> Link to more stuff  &raquo;</a></p>
         -->
-        </div>
-        <div class="col-md-4">
-          <!-- <h2>Heading</h2> -->
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <!-- 
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-        -->
-       </div>
-        <div class="col-md-4">
-          <!-- <h2>Heading</h2>-->
-          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-          
-          <p><a class="btn btn-default" href="#" role="button">More ... &raquo;</a></p>
-      
-        </div>
+    
+        
+
+
       </div>
 
       <hr>
 
       <footer>
-        <p>&copy; Joyce Inc. 2014</p>
+        <p>&copy; Joyce Inc. 2015</p>
       </footer>
     </div> <!-- /container -->
 

@@ -3,28 +3,34 @@
 <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon" />
 	<title>All Things DS Recommender</title>
 <head>
-<!--	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='/css/bootstrap.css') }}"></link> -->
+<!-- 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}"></link>
+-->
     <link rel="stylesheet" type="text/css" href="http://s1.nyt.com/search/add/assets/0.0.79001-51/css/min.css">
 	<script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
 	<script type="text/javascript" src="http://underscorejs.org/underscore-min.js"></script>
 </head>
 
-
 <style type="text/css">
-	   
-    textarea{
+	
+	textarea{
     display: block;
     margin-left: auto;
     margin-right: auto;
     width: 500px;
-    }
-    h2{
-    text-align: center;
-    font-family:'Helvetica Neue', sans-serif;
-    font-size:30px;
-    /*color:#191970*/
+	}
+	h2{
+	text-align: center;
+	font-family:'Helvetica Neue', sans-serif;
+	font-size:30px;
+	/*color:#191970*/
     color: #191919;
-    }
+    background-image:url('../static/img/img2.png'); /*no-repeat*/
+    background-repeat: no-repeat;
+    background-position: center; /*top left;*/
+    /*opacity: 0.35;*/
+    padding: 50px;
+    /*background-attachment: scroll;*/
+	}
     h3{
     margin-left: 40px; 
     margin-right: 30px; 
@@ -47,117 +53,81 @@
     width: auto; /*\9; *//* ie8 */
     margin-left: 50px;
     text-align: center;
-    opacity: 0.6;
+    opacity: 0.35;
     /* filter: alpha(opacity=60);*/
     margin-right: 40px;
-    float: left;
+    float: center;
+    }
+    p.centeredImage
+    {
+    text-align:center;
+    margin-top:0px;
+    margin-bottom:0px;
+    padding:0px;
     }
     p{
     margin-left: 40px;   
     margin-right: 50px;
-    font-size:10px;
+    font-size:12px;
     }
-    input{
+	input{
     display: inline-block;
     margin-left: 250px;
     font-size:10px;   
-    }
+	}
     p#input {
     background-color: #e4e4e4;
     margin-left: 40px;      
     margin-right: 50px;
     font-size:10px;
     }
-
-    /*
-	textarea{
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 500px;
-	}
-	h2{
-	text-align: center;
-	font-family:'Helvetica Neue', sans-serif;
-	font-size:30px;
-	color:#191970
-	}
-    h3{
-    margin-left: 40px; 
-    margin-right: 30px; 
-    font-family:'Helvetica Neue', sans-serif;
-    font-size:20px;
-    color:#191970
-    }
-    h4{
-    margin-left: 40px; 
-    margin-right: 30px; 
-    font-family:'Helvetica Neue', sans-serif;
-    font-size:15px;
-    color:#888888
-    }
-    img {
-    max-width: 90%;
-    height: auto;
-    width: auto\9;  *//* ie8 */
-    /*
-    margin-left: 40px
-
-    }
-    */
-    /*
-	img{
-    display: inline-block;
-    margin-left: 70px;
-	}
-    */
-    /*
-    p{
-    margin-left: 40px;   
-    margin-right: 40px
-    }
-	input{
-    display: inline-block;
-    margin-left: 250px;
-	}
- 
-    p#input {
-    background-color: #e4e4e4;
-    margin-left: 50px;      
-    margin-right: 70px;
-    }
-    */
 </style>
+
 <body>
-<!-- username = username, idx = range(df_recom.shape[0]), \
-        df_recom = df_recom, relevant=relevant_all -->
+
 <!-- username = username, df_recom = df_recom, relevant=relevant_all -->
-    <p> 
-        <br>
-        &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href = '/'><b>All Things DS</b> </a>  &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <a href = '/form'> <b>Search by Text</b></a>
-
 	<div class="container">
-	<hr>
-	<img src="../static/img/mountains.jpg" alt="places" height="155" width="800">
-	<hr>
-		<h2>Data Science Articles Recommended for <font color='red'>{{username}}</font></h2>
 
-    <!--  example of getting variables 
-    <p> This acticle is about: <b><font color="blue"> {{y_pred}} </font> </b>  </p>
-    <p> Text read in: </p>
-    <p id = "input"> {{data}}</p>
-        -->
-    <p>
-    </p>
+        <p>
+            <br>
+        <!--    &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href = '/'><b> All Things DS</b> </a> 
+            &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href = '/'> <b>Search by Text</b></a>-->
+        <a class="navbar-brand" href="/">Search by Text</a>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a class="navbar-brand" href="/browse"> Browse  &nbsp;&nbsp;&nbsp;</a>  
+        <a class="navbar-brand" href="/topic_trends"> Trends&nbsp;</a>  
+        <!-- <a class="navbar-brand" href="#"> Trending&nbsp;</a>   -->
+        <a class="navbar-brand" href="#"> GitHub&nbsp;</a>  
 
+        </p>
+        
+    <!-- 
+    	<hr>
+    <img src="../static/img/mountains.jpg" alt="places" height="125" width="600",align = 'middle'>
+    	-->
+        <hr>
+    		<h2>Data Science Article Recommendations for <font color='red'>{{username}}</font></h2>
+        <hr>
     </div>
+    <br> 
 
    <div class="container">
       <div class="row">
-        <div class="col-md-4"> 
-        <br>
-        <!-- {% for i in idx %} -->
+          <div class="col-md-4"> 
+            <ol>
+                <ul>
+                <p><b> Base on <font size=3> input </font>: </b></p>
+            <p id='input'>
+                <br>  <b>  {{input_data}}  </b> <br> </p>
+                <br>
+            <p>       {{ sorted_topics }}
+                </p>
+                 <p><b> Recommendations: </b></p>
+                </ul>
+            </ol>
+             <p> 
+
+        {% for i in idx %}    <!-- loop through recommended articles -->
         <p>
          <!-- <ol class="searchResultsList flush" style="display: block;"> -->
          <ol>
@@ -167,42 +137,32 @@
             <div class="element2"
             <p>
             <h3>
-                <a href= "{{df_recom.iloc[i]['url']}}" target="_blank">{{df_recom.iloc[i]['title']}}</a>
+                <a href= "{{df_recom.iloc[i]['url']}}" target="_blank"> {{df_recom.iloc[i]['title']}} </a>
             </h3>
             </p>
 
-            <p class = "summary"> {{df_recom.iloc[i]['body_text'][:1000]}}
-                 ( <a href= "{{df_recom.iloc[i]['url']}}" target="_blank"><b> more on web ... </b></a> ) 
-
+            <p class = "summary"> {{df_recom.iloc[i]['body_text']}} 
+                ( <a href= "{{df_recom.iloc[i]['url']}}" target="_blank"><b> more on web ... </b></a> ) 
             </p>
-            <div class="storyMeta"> 
-                <br>
-                <p> <font color=#990033> based on your ratings for:</font>
-                    <br>
-            {% for idx, row in relevant_all[i].iterrows() %}
-                    <h4> 
-                      <a href= "{{ row['url']}}" target="_blank"> <font color=#686868> {{row['title']}} </font></a></h4>
-                      <p>
-                      similarity score: {{row['sim']}}, rating: {{row['rating']}}
-                      <br>
-                     <br>
-                      {{row['body_text'][:1000]}}  
-                      ( <a href= "{{row['url']}}" target="_blank"><b> more on web ... </b></a> ) 
-            {% endfor %} 
 
-                </p> 
-            </div>
-            </div>
-        </ul>
+                <div class="storyMeta"> 
+                     <h4> 
+                      <a href= #  > <font color=#686868> This article  </font></a></h4>
+                <p>
+                    is related to topics  {{df_recom.iloc[i]['topics']}} <br>
+                    relevance to your input: {{df_recom.iloc[i]['score']}}  <br>
+                <p>
 
+                </div>
+            </div>
+            </ul>
         </ol>
 
         {% endfor %} 
 
-
         </div>
      </div>
-       </div>
+    </div>
   
 
 
@@ -249,6 +209,5 @@
         </script>
 
 </body>
-
 
 </html>

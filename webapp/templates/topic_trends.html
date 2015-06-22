@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<!-- to-do 
+hardcode
+-->
+<style>
+body {
+    font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke-width: 1;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.bar {
+    fill:#7094B8;  /* light blue*/ /*orange;*/
+}
+
+.bar:hover {
+    fill: #000066; /*dark blue*/ /*orangered ;*/
+}
+
+.d3-tip {
+    line-height: 1;
+    font-weight: bold;
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip 
+black downpoint triange of the tooltip
+*/
+.d3-tip:after {
+    box-sizing: border-box;
+    display: inline;
+    font-size: 10px;
+    width: 100%;
+    line-height: 1;
+    color:rgba(0, 0, 0, 0.8);
+    content: "\25BC";
+    position: absolute;
+    text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+    margin: -1px 0 0 0;
+    top: 100%;
+    left: 0;
+}
+
+/* this code is for the 2nd plot: time series plot */
+div.tooltip {
+    position: absolute; 
+    text-align: left;
+    width: 200px;
+    padding: 8px;
+    font: 13px sans-serif;
+    background: #66CCFF; /*lightsteelblue;*/
+    border: 0px;
+    border-radius: 8px;
+}
+
+div.tooltip a {
+    color: blue;
+    text-decoration: none;
+}
+
+div.tooltip a:hover {
+    color: blue;
+    text-decoration: underline;
+}
+
+p {
+    color: black;
+    /*margin: 0.25em 0*/;
+    font-size: 1.5em;
+}
+
+h1 { 
+    display: block;
+    font-size: 3em;
+    margin-top: 0.67em;
+    margin-bottom: 0.67em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
+}
+</style>
+
+<body>    
+ <p>
+            <br>
+        <!-- &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href = '/'><b> All Things DS Home</b> </a> -->
+        <a class="navbar-brand" href="/">Search by Text</a>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a class="navbar-brand" href="/browse"> Browse  &nbsp;&nbsp;&nbsp;</a>  
+        <a class="navbar-brand" href="/topic_trends"> Trends&nbsp;</a>  
+        <!-- <a class="navbar-brand" href="#"> Trending&nbsp;</a>   -->
+        <a class="navbar-brand" href="#"> GitHub&nbsp;</a>   
+<hr>
+<h1> Topic Trends </h1>
+<p> Explore data science topics discovered using data science.</p>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+
+<script>
+//1st plot svg: number of articles by topic
+// margin to the body text
+var margin = {top: 40, right: 20, bottom: 30, left: 70},
+    width = 800 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+var topic = 0
+var max_topics = 0
+
+var x = d3.scale.ordinal().rangeRoundBands([0, width], .1);
+var y = d3.scale.linear().range([height, 0]);
+
+var xAxis = d3.svg.axis()
+              .scale(x)
+              .orient("bottom");
+
+var yAxis = d3.svg.axis()
+              .scale(y)
+              .orient("left")
+
+var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+var tip = d3.tip()
+    .attr('class', 'd3-tip')
+    .offset([-10, 0])
+    .html(function(d) {
+       // return "<img src='static/topic_" + max_topics + "_" + d.ntopic +
+        //       ".png' style='width:120px'>"
+        //return "topic " + (d.itopic+1) + ": " + d["topic_name"] //.topic_name[d.itopic] 
+        //return d;
+        return "topic #"+(d.itopic+1)+": " + d['topicname'];
+        console.log(d)
+        //return d.data
+        })
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+svg.call(tip);
+
+
+/* 2nd plot svg2 */
+// Parse the date 
+var parseDate = d3.time.format("%Y-%m-%d").parse;
+
+// Set the ranges
+var	x2 = d3.time.scale().range([0, width]);
+var	y2 = d3.scale.linear().range([height, 0]);
+
+// Define the axes
+var	xAxis2 = d3.svg.axis().scale(x2).orient("bottom").ticks(10);
+var	yAxis2 = d3.svg.axis().scale(y2).orient("left").ticks(5);
+
+// Define the line 
+// data for 2nd plot, fraction, after clicking a topic
+var lineFunction = d3.svg.line()
+    .x(function(d) { return x2(d.date); })
+    .y(function(d) { return y2(d.fraction); })
+    .interpolate("linear");
+// data for inital 2nd plot line
+var lineFunction2 = d3.svg.line()
+    .x(function(d) { return x2(d.date2); })
+    .y(function(d) { return y2(d.n_articles_month); })
+    .interpolate("linear");
+
+// Define 'div' for tooltips
+var div = d3.select("body")
+    .append("div")  // declare the tooltip div 
+    .attr("class", "tooltip")  // apply the 'tooltip' class
+    .style("opacity", 0);      // set the opacity to nil
+
+// Add 2nd svg canvas: number of articles per month
+var	svg2 = d3.select("body")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom + 15)
+    .append("g")
+    .attr("transform", 
+    "translate(" + margin.left + "," + 60 + ")");
+
+// assemble the 1st plot svg
+d3.csv('static/articles_per_topic.csv?_=' + Math.random(), type_data1, function(error, data) {
+    svg.append("text")
+        .attr("class","title")
+        .attr("x", width*0.5-60)
+        .attr("y", 5)
+        .attr("font-size","18px")
+        .attr("color", "blue")
+        .text("Number of Articles per Topic")
+
+    data.forEach(function(d) {
+    d.topicname  =  d.topicname;
+  })
+
+	// In the data file, ntopic starts from 0, x axis values here start from 1
+    // range
+    x.domain(data.map(function(d) {return d.itopic + 1;}));
+    y.domain([0, d3.max(data, function(d) {return d.narticles;})]);
+
+    max_topics = d3.max(data, function(d) {return d.itopic + 1;})
+    console.log(max_topics)
+
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -100)
+        .attr("y", -40)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Number of Ariticles");
+
+    svg_bars = svg.selectAll(".bar")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d) { return x(d.itopic + 1); })
+        .attr("width", x.rangeBand())
+        .attr("y", function(d) { return y(d.narticles); })
+        .attr("height", function(d) { return height - y(d.narticles); })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
+
+    // assemble 2nd plot svg2
+    /// the csv file does not seem to be used????
+
+    //d3.csv("static/articles_per_month.csv", type_data3, function(error, dataW) {
+    d3.csv('static/articles_per_month.csv?_=' + Math.random(), type_data3, function(error, dataW) {  
+    // for testing hack to not cache csv files
+
+        x2.domain(d3.extent(dataW, function(d) { return d.date2; }));
+        //y2.domain([0, d3.max(dataW, function(d) { return d.n_articles_month; })]);
+        y2.domain([0,200]) // hardcode y axis range 2nd plot
+
+        svg2.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis2);
+
+        // y axis label
+        svg2.append("g")
+            .attr("class", "y axis")
+            .call(yAxis2)
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -50)
+            .attr("y", -40)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Number of Ariticles");
+
+        svg2.append("path") // ad value path  fraction
+            .attr('class', 'timeSeries')
+            .attr("stroke", "blue")
+            .attr("stroke-width", 2)
+            .attr("fill", "none")
+            .attr("d", lineFunction2(dataW));
+
+        // initial 2nd plot
+        svg2.selectAll("dot").data(dataW)
+            .enter().append("circle")
+            .attr("class","time_plot1")
+            .attr("r", 5)
+            .attr("cx", function(d) { return x2(d.date2); })
+            .attr("cy", function(d) { return y2(d.n_articles_month); })
+            .attr("fill", "blue") //orange")
+
+        svg2.append("text")
+            .attr("class","title")
+            .attr("x", width*0.5 - 60)
+            .attr("y", 5)
+            .attr("font-size","18px")
+            .text('Number of Articles per Month (all topics)');
+    });
+
+    //this is used to make responsive 2nd plot; 
+    d3.csv('static/data.csv?_=' + Math.random(), type_data2, function(error, dataT) {
+    //d3.csv("static/data.csv", type_data2, function(error, dataT) {
+        var drawTopic = function(topic) {
+            var newData = dataT.filter(function(d) {
+                return d.topic == topic;
+            });
+            drawTimeSeries(newData);
+        };
+
+        var reDraw = function(d) {
+            svg2.html(''); // clear everything if any
+            console.log(d);
+            var topic = +d.itopic;
+            var topicname = d.topicname
+            
+            d3.select("rect.selected_bar").remove()
+            d3.select("text.selected_text").remove()
+
+            // after tooltip
+            svg.append('rect')
+                .attr("class","selected_bar")
+                .attr("x", function(d) { return x(topic + 1); })
+                .attr("y", 291) //291)
+                //.attr("height", function(d) { return height - y(d.frequency)
+                .attr("width", x.rangeBand())
+                .attr("height", 18+40) //!!! need to move this based on plot margine +4)
+                .attr("fill","blue") // orange")
+                .style("opacity", 0.5);
+            
+            svg.append('text')
+                .attr("x", function(d) { return x(topic + 1); })
+                .attr("class", "selected_text")
+                .attr("y", 291) //291)
+                .attr("font-size","14px") // orange")
+                .text(function(d) {  
+                    return topicname});    
+            
+            svg2.append("text")
+                .attr("class","title")
+                .attr("x", width*0.5 - 120)
+                .attr("y", 15)
+                .attr("font-size","18px")
+                .text(function(d) {  
+                    return topicname + " (% articles per month) "});
+            
+            // clear tooltip
+            //d3.selectAll("a.headline").remove()
+            div.style("opacity", 0)
+
+            //show img of word cloud 
+            /*
+            svg.select("image.wordCloud")
+                   .attr("xlink:href", "static/white_space.png")
+                   */
+           //     .attr("xlink:href", "static/topic_" + max_topics + "_" +
+             //                       d.ntopic + ".png");
+
+            // responsive 2nd plot
+            /*
+            svg2.append("text")
+                .attr("class","title")
+                .attr("x", width*0.5-60)
+                .attr("y", 15)
+                .attr("font-size","18px")
+                .html("Percent of Articles per Month - <b>" + topicname ) //+ "</b>")
+            */
+                //.html("Percent of Articles per Month - <b>"+ topicname + "</b>")
+
+            drawTopic(topic);
+        };
+
+        svg_bars.on("click", reDraw);
+        //drawTopic(topic);
+    }); // csv for 2nd plot
+}); // csv for 1st plot
+
+var drawTimeSeries = function(data) {
+    // Scale the range of the data
+    // xlim, ylim
+    x2.domain(d3.extent(data, function(d) { return d.date; }));
+    //y2.domain([0, d3.max(data, function(d) { return d.fraction; })]);
+    y2.domain([0,30])
+
+    svg2.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis2);
+    
+    svg2.append("g")
+        .attr("class", "y axis")
+        .call(yAxis2)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -100)
+        .attr("y", -40)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        //.text("Number of Ariticles");
+        .text("Percent of Articles")
+
+    svg2.append("path") // ad value path
+        .attr('class', 'timeSeries')
+        .attr("stroke", "blue")
+        .attr("stroke-width", 2)
+        .attr("fill", "none")
+        .attr("d", lineFunction(data));
+
+    svg2.selectAll("dot").data(data)
+        .enter().append("circle")
+        .attr("class","time_plot")
+        .attr("r", 5)
+        .attr("cx", function(d) { return x2(d.date); })    
+        .attr("cy", function(d) { return y2(d.fraction); })
+        .attr("fill", "blue") // "orange")
+        // Tooltip stuff after this
+        //.on("mouseover", drawToolTip)
+}
+
+// draw toop tip for time series plot on mouseover
+var drawToolTip = function(d) {
+    resetToolTip(d)
+
+    d3.select(this).style("fill", "red");
+
+    var urls = []
+    var nLines = d.n_articles > 5 ? 5 : d.n_articles
+    for(var i = 0; i < nLines; i++) {
+        urls.push({href : d['url' + i], txt : d['headline' + i]});
+    }
+
+    var div_tip = div.style("left", (d3.event.pageX)+ 10 + "px")
+                     .style("top", (d3.event.pageY) + "px");
+  
+    div_tip.selectAll("a").data(urls).enter().append("a")
+        .attr("class","headlines")
+        .attr("href", function(d) {return d.href;})
+        .html(function(d) {return d.txt + '<br/>' ;})
+
+    //div_tip.append("p").attr("class","number").text('Articles: '+d.n_articles)
+}
+
+// reset time series plot tooltip
+var resetToolTip = function(d) {
+    d3.selectAll("a.headlines").remove()
+    d3.selectAll("circle.time_plot").style("fill", "blue") // orange")
+    d3.selectAll("p.number").remove()
+    div.transition().duration(500).style("opacity", 0);
+    div.transition().duration(200).style("opacity", .9);
+}
+
+// read in data file
+// number of articles per topic
+// articles per topic.csv
+function type_data1(d) {
+    d.itopic = +d.itopic
+    d.narticles= +d.narticles;
+    d.topicname= d.topicname;
+    return d;
+}
+
+// change type of data for the 2nd file
+// example articles:  data.csv
+// monthly fraction of articles by topic
+function type_data2(d) {
+    d.date = parseDate(d.month_date);  // column name 
+    d.n_articles = +d.n_articles;
+    d.fraction =  +d.fraction;  //+d.fraction
+    d.topic = +d.topic;
+    return d;
+}
+
+// number of articles per month
+function type_data3(d) {
+    d.date2 = parseDate(d.date);
+    d.n_articles = +d.n_articles;  // column name
+    return d;
+}
+
+</script>
