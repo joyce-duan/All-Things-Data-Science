@@ -29,7 +29,7 @@ plt.rcParams['figure.figsize'] = (15, 5)
 
 import sys
 sys.path.append('../db')
-from mongo import MyMongo
+from my_mongo import MyMongo
 
 
 # ## read in articles from mongo db, clean, merge, tfidf

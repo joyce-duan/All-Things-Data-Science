@@ -8,8 +8,13 @@ is it necessary to try other extraction methods and why?
 '''
 
 import sys
-sys.path.append('../db')
-from mongo import MyMongo
+#sys.path.append('../db')
+
+from configobj import ConfigObj
+config = ConfigObj('../allds.config')
+allds_home = config['allDS_home']
+sys.path.append(allds_home+'/code/db')
+from my_mongo import MyMongo
 from httplib import BadStatusLine
 from boilerpipe.extract import Extractor
 

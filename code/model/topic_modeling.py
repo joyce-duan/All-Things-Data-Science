@@ -4,7 +4,9 @@ NMF mixing up articles and topics???
 '''
 
 from configobj import ConfigObj
-config = ConfigObj('../../allds.config')
+config=ConfigObj('allds.config')
+#config = ConfigObj('../../allds.config')
+print config
 allds_home = config.get('allDS_home','/Users/joyceduan/Documents/git/All-Things-Data-Science/')
 data_home = allds_home + 'data/'
 
@@ -26,13 +28,13 @@ sys.path.append(allds_home + 'code/db')
 sys.path.append(allds_home +'code/preprocess')
 sys.path.append(allds_home  + 'code/model')
 sys.path.append(allds_home  + 'code/recommender')
-#print allds_home + 'code/db'
+print allds_home + 'code/db'
 #print allds_home  + 'code/recommender'
 #sys.path.append('../preprocess')
 #sys.path.append('../model')
 
 
-from mongo import MyMongo
+from my_mongo import MyMongo
 from ArticleProceser import  clean_articles, fit_tfidf, transform_tfidf, ascii_text
 from nmf import run_nmf, get_top_topics_terms
 #from recommender import Recommender
