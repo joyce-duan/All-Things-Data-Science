@@ -25,9 +25,9 @@ import sys
 sys.path.append(allds_home + 'code/db')
 sys.path.append(allds_home +'code/preprocess')
 sys.path.append(allds_home  + 'code/model')
-
-print allds_home + 'db'
-
+sys.path.append(allds_home  + 'code/recommender')
+#print allds_home + 'code/db'
+#print allds_home  + 'code/recommender'
 #sys.path.append('../preprocess')
 #sys.path.append('../model')
 
@@ -35,6 +35,7 @@ print allds_home + 'db'
 from mongo import MyMongo
 from ArticleProceser import  clean_articles, fit_tfidf, transform_tfidf, ascii_text
 from nmf import run_nmf, get_top_topics_terms
+#from recommender import Recommender
 
 import string
 import pickle as pickle
@@ -42,6 +43,9 @@ import pandas as pd
 import numpy as np
 import time
 import matplotlib.pyplot as plt
+
+import unicodedata
+from datetime import date, timedelta as tdel
 
 n_top_articles = 5
 n_top_terms = 15
@@ -71,6 +75,9 @@ class TopicModel(object):
             self.kw_tfidf = kw_tfidf
 
         self.kw_nmf = kw_nmf
+
+    def get_topic_names(self):
+        return self.topic_names
 
     def dump_model(self, note = ''):
         '''
@@ -340,6 +347,10 @@ class TopicModel(object):
         '''
         assign article to 1 cluster (highest w above min_w)
                 -1  if w is too low
+            - INPUT: 
+                self.best_topics_per_article
+            - OUTPUT:
+                self.clusters
         '''
         n_articles = self.best_topics_per_article.shape[0]
         clusters = -1 * np.ones(n_articles)
@@ -444,6 +455,7 @@ def read_articles():
     #article_dict_all = dict(article_dict)
     df['title'] = df['url'].map(lambda x: article_dict.get(x,'Unknown'))
     df['uri'] = df['url'].map(lambda x: parse_url(x).host)
+
     my_mongo.close()
 
     return df
@@ -529,7 +541,8 @@ def tune_hyper_params():
     func_tokenizer = TfidfVectorizer(stop_words = 'english').build_tokenizer()
     run_model(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer)
 
-if __name__ == '__main__':
+
+def test_run_modeler():
     model_name = 'v2_2'
     func_tokenizer = TfidfVectorizer(stop_words = 'english').build_tokenizer()
     func_stemmer = PorterStemmer()
@@ -538,4 +551,11 @@ if __name__ == '__main__':
  
     df = read_articles()
     W, tokenized_articles, vectorized_X = topic_model.transform_bodytext2topics(df.body_text[0:5],1)
-    print topic_model.sorted_topics_for_articles(W)
+
+    sorted_topics = topic_model.sorted_topics_for_articles(W) 
+
+if __name__ == '__main__':
+    test_run_modeler()
+
+    #tune_hyper_params()
+

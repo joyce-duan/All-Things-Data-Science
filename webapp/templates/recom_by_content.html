@@ -93,9 +93,9 @@
         <!--    &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href = '/'><b> All Things DS</b> </a> 
             &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <a href = '/'> <b>Search by Text</b></a>-->
-        <a class="navbar-brand" href="/">Search by Text</a>&nbsp;&nbsp;&nbsp;&nbsp;
-        <a class="navbar-brand" href="/browse"> Browse  &nbsp;&nbsp;&nbsp;</a>  
-        <a class="navbar-brand" href="/topic_trends"> Trends&nbsp;</a>  
+        <a class="navbar-brand" href="/">Find Articles</a>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a class="navbar-brand" href="/browse"> Browse  </a>  &nbsp;&nbsp;&nbsp;
+        <a class="navbar-brand" href="/topic_trends"> Trends</a>  &nbsp;&nbsp;&nbsp;&nbsp;
         <!-- <a class="navbar-brand" href="#"> Trending&nbsp;</a>   -->
         <a class="navbar-brand" href="#"> GitHub&nbsp;</a>  
 
@@ -106,7 +106,7 @@
     <img src="../static/img/mountains.jpg" alt="places" height="125" width="600",align = 'middle'>
     	-->
         <hr>
-    		<h2>Data Science Article Recommendations for <font color='red'>{{username}}</font></h2>
+    		<h2>Data Science Article Finder <font color='red'>{{username}}</font></h2>
         <hr>
     </div>
     <br> 
@@ -116,13 +116,19 @@
           <div class="col-md-4"> 
             <ol>
                 <ul>
-                <p><b> Base on <font size=3> input </font>: </b></p>
+                <p><b> Based on <font size=3> input </font>: </b></p>
             <p id='input'>
                 <br>  <b>  {{input_data}}  </b> <br> </p>
                 <br>
-            <p>       {{ sorted_topics }}
+            <p>   <b><font color=#686868> related topics: </b>
+                  {% for topic in sorted_topics %}
+                  {{topic[0]}}({{topic[1]}})&nbsp;&nbsp;&nbsp;&nbsp;
+
+                 {% endfor %} 
+                
+
                 </p>
-                 <p><b> Recommendations: </b></p>
+                 <p><b> Articles found: </b></p>
                 </ul>
             </ol>
              <p> 
@@ -146,20 +152,19 @@
             </p>
 
                 <div class="storyMeta"> 
-                     <h4> 
-                      <a href= #  > <font color=#686868> This article  </font></a></h4>
                 <p>
-                    is related to topics  {{df_recom.iloc[i]['topics']}} <br>
-                    relevance to your input: {{df_recom.iloc[i]['score']}}  <br>
+                    <b><font color=#686868> relevance: </font> </b>{{df_recom.iloc[i]['relevance']}}  <br>
+                    <b><font color=#686868> related topics </b>  
+                    {% for topic in df_recom.iloc[i]['topics'] %}
+                        {{topic[0]}} ({{topic[1]}}) &nbsp;&nbsp;&nbsp;&nbsp;
+                    {% endfor %} 
+                     <br>
                 <p>
-
                 </div>
             </div>
             </ul>
         </ol>
-
         {% endfor %} 
-
         </div>
      </div>
     </div>

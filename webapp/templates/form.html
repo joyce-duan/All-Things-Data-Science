@@ -1,18 +1,3 @@
-<!-- 
-<!DOCTYPE HTML>
-<html>
-<link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon" />
-	<title>Data Science Article Recommender</title>
-<head>
--->
-<!--	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='/css/bootstrap.css') }}"></link>
--->
-
-<!-- testing
-	<script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
-	<script type="text/javascript" src="http://underscorejs.org/underscore-min.js"></script>
-</head>
--->
 <!DOCTYPE HTML>
 <html>
 <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon" />
@@ -25,29 +10,6 @@
 </head>
 
 <style type="text/css">
-	/*
-	textarea{
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 500px;
-	}
-	h2{
-	text-align: center;
-	font-family:'Helvetica Neue', sans-serif;
-	font-size:40px;
-	color:#191970
-	}
-	img{
-    display: inline-block;
-    margin-left: 70px;
-	}
-	input{
-    display: inline-block;
-    margin-left: 250px;
-	}
-*/
-
 
     textarea{
     display: block;
@@ -108,6 +70,13 @@
     margin-left: 250px;
     font-size:10px;   
     }
+    input.search {
+    /*width: 3em;  height: 10em;*/
+    font-size: 1.5em;
+    margin-left: 600px;
+    background: #E0E0E0 ; /*light gray*/
+    /*float:right;*/
+    }   
     p#input {
     background-color: #e4e4e4;
     margin-left: 40px;      
@@ -120,6 +89,7 @@
     font-size:12px;
     text-align: center;
     }
+
 </style>
 
 <body>
@@ -128,9 +98,9 @@
             <br>
           <!-- &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href = '/'><b> All Things DS</b> </a> -->
 
-        <b>Search by Text</b>&nbsp;&nbsp;&nbsp;&nbsp;
-        <a class="navbar-brand" href="/browse"> Browse  &nbsp;&nbsp;&nbsp;</a>  
-        <a class="navbar-brand" href="/topic_trends"> Trends&nbsp;</a>  
+        <b>Find Articles</b>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a class="navbar-brand" href="/browse"> Browse  </a>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a class="navbar-brand" href="/topic_trends"> Trends</a>  &nbsp;&nbsp;&nbsp;&nbsp;
         <!-- <a class="navbar-brand" href="#"> Trending&nbsp;</a>   -->
         <a class="navbar-brand" href="#"> GitHub&nbsp;</a>    
 
@@ -159,26 +129,23 @@
    <form action={{action}} method='POST' >
        <!-- <input type="text" name="user_input" size = 100 /> -->
        <!--  <input type="submit" /> -->
-        <textarea rows="6" cols="20" name="user_input" wrap="hard">
+        <textarea rows="8" cols="25" name="user_input" wrap="hard">
         
             spark hadoop big data
         </textarea>
         <br>
-                <input type="submit" />
+                <input type="submit" class="search" />
     </form>
-<!--
-<form action="demo_form.asp">
-<textarea rows="2" cols="20" name="usrtxt" wrap="hard">
-At W3Schools you will find free Web-building tutorials.
-</textarea>
-<input type="submit">
-</form>
--->
+
+
         </div>
         <br>
         <div class="container">
-                     <div id="intro" style ="font-family: 'Helvetica Neue', sans-serif; font-size:25px; font-weight:bold;"></div>
-                    <div id="results" style ="font-family: 'Helvetica Neue', sans-serif; font-size:40px; color:#C02942; font-weight:bold;"></div>
+                     <div id="intro" style ="font-family: 'Helvetica Neue', sans-serif; font-size:25px; font-weight:bold;">  </div>
+                    <div id="results" style ="font-family: 'Helvetica Neue', sans-serif; font-size:1em;"> </div>
+     <p class="centeredImage"> An online collection of over 4000 data science related articles published from Dec 2013 to June 2015 by ### unique websites, covering broad topics (language agnostic) 
+                        <a href="https://github.com/joyce-duan/All-Things-Data-Science">...more...</a>
+                    </p>
         </div>
 <!--
          <script type="text/javascript">
@@ -215,8 +182,6 @@ At W3Schools you will find free Web-building tutorials.
         })
         </script>
     -->
-
 </body>
-
 
 </html>

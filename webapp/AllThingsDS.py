@@ -1,3 +1,27 @@
+
+'''
+ToDo: ????
+                1. unicode character: copy and paste did not work
+2. make the form larger
+3. what happens in '\n' was entered in the form??
+
+
+input:  
+
+
+'''
+
+'''
+to start this
+python the_app.py
+
+Pre-requisit:
+    - topic_names.csv ????
+    -  vectorizer?
+    - H ???
+'''
+
+
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
@@ -17,6 +41,7 @@ import pandas as pd
 #from build_model import read_model, transform_tfidf, model_pkl_fname, vectorizer_pkl_fname 
 import pickle
 import time
+import numpy as np
 
 sys.path.append('../code/model')
 sys.path.append('../code/preprocess')
@@ -31,25 +56,9 @@ config = ConfigObj('../allds.config')
 allds_home = config['allDS_home']
 data_home = allds_home + 'data/'
 dummy_result_pkl = 'dummy_results.pkl'
-
-'''
-ToDo: ????
-                1. unicode character: copy and paste did not work
-2. make the form larger
-3. what happens in '\n' was entered in the form??
-
-
-input:  
-
-
-'''
-
+username = 'DSI6'
 app = Flask(__name__)
 
-'''
-to start this
-python the_app.py
-'''
 
 my_title = '''<html>
         <head>
@@ -85,13 +94,32 @@ def cool_form():
 
 
 def recommender_by_content():
-    username = 'Joyce'
+    #username = 'Joyce'
     data = request.form['user_input']
     input_name = 'your_input'
-    #results_dict = get_recom_from_input(username, input_name, data)
+
+    results_dict = get_recom_from_input(username, input_name, data)
     # for testing
-    results_dict = dummy_recom(username, input_name, data)
+    #results_dict = dummy_recom(username, input_name, data)
+
+    results_dict['sorted_topics'] = format_related_topics(results_dict['sorted_topics'][0])
+
     return render_template('recom_by_content.html', **results_dict )
+
+def format_related_topics(topics):
+    #topics = results_dict['sorted_topics'][0]
+    print 'topics:', topics
+    print topics[0]
+    score = [t[2] for t in topics  if t[2] > 0]
+    score_filtered = [t[2] for t in topics if t[2] >= np.mean(score)]
+
+    max_score = max(score)
+    scores_str = []
+    for i in xrange(min(3, len(score_filtered))):
+        print 'i: ', topics[i]
+        #scores_str.append('<b>%s</b> (%i)' % (topics[i][1], int(100 * topics[i][2]/max_score)))
+        scores_str.append( (topics[i][1], int(100 * topics[i][2]/max_score)))
+    return scores_str
 
 def get_recom_from_input(username, input_name, data):
     model_name = 'v2_2'
@@ -121,10 +149,14 @@ def get_recom_from_input(username, input_name, data):
     t1 = time.time()
     print "finished in  %4.4f min %s " %((t1-t0)/60,'finished all processing\n')
 
+
+    df_recom['topics'] = df_recom['topics'].apply(format_related_topics)
+
     results_dict = dict(username = username,\
     input_data = data, input_name = input_name, sorted_topics = sorted_topics, \
     idx = range(df_recom.shape[0]), \
         df_recom = df_recom, relevant_all=relevant_all)
+
     with open(dummy_result_pkl,'w') as out_fh:  
         pickle.dump(results_dict, out_fh)
     return results_dict
@@ -135,7 +167,7 @@ def dummy_recom(username, input_name, data):
     return results_dict
 
 def recommender_by_contentold():
-    username = 'Joyce'
+    #username = 'DSI6'
     model_name = 'v2_2'
 
     data = request.form['user_input']
@@ -175,7 +207,7 @@ def recommender_by_contentold():
 @app.route('/recommender_by_ratings')
 
 def recommender_by_ratings():
-    username = 'Joyce'
+    #username = 'Joyce'
     with open('../code/eda/df_recom.pkl','r') as f:
         df_recom = pickle.load(f)
     with open('../code/eda/relevant_all.pkl','r') as f:

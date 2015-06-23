@@ -42,6 +42,7 @@ class Recommender(object):
         self.top_k_recommend = 5
         self.max_rank = 50
         self.top_k_topics = 5
+        self.max_cosine_sim_tfidf = 0.5
 
         self.method = None # content or rating
         self.max_len_body_text = 3000        
@@ -135,6 +136,10 @@ class Recommender(object):
         desc_sim_indexes = np.argsort(cosine_similarities)[::-1]
         recommed_articles = []
         i_print = 0
+        max_cosine_sim_tfidf = 0.5
+        if self.max_cosine_sim_tfidf:
+            max_cosine_sim_tfidf = self.max_cosine_sim_tfidf
+
         for i in desc_sim_indexes[:self.max_rank]:
             if cosin_simi_latent_topics_rank[i]< self.max_rank and i_print < self.top_k_recommend:
                 r = {}
@@ -145,6 +150,7 @@ class Recommender(object):
                 r['body_text']= body_cleaned
                 r['url'] = url
                 r['topics'] = self.sorted_topics_articles[i][0:self.top_k_topics] # (itopic, topic_name, weight)
+                r['relevance'] = min(100, int(cosine_similarities[i] / self.max_cosine_sim_tfidf * 100))
                 recommed_articles.append(r)            
                 #print sorted_topics_articles[i][0:2]
                 print cosine_similarities[i], cosine_similarities_rank[i], '***'+ self.df_articles.iloc[i].title+'***'
