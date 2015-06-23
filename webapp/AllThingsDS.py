@@ -20,8 +20,6 @@ Pre-requisit:
     -  vectorizer?
     - H ???
 '''
-
-
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
@@ -38,22 +36,25 @@ from flask import render_template
 from flask import request
 import datetime
 import pandas as pd
-#from build_model import read_model, transform_tfidf, model_pkl_fname, vectorizer_pkl_fname 
 import pickle
 import time
 import numpy as np
 
-sys.path.append('../code/model')
-sys.path.append('../code/preprocess')
-sys.path.append('../code/recommender')
+#sys.path.append('../code/model')
+#sys.path.append('../code/preprocess')
+#sys.path.append('../code/recommender')
+
+from configobj import ConfigObj
+config = ConfigObj('../allds.config')
+allds_home = config['allDS_home']
+sys.path.append(allds_home  + 'code/model')
+sys.path.append(allds_home  + 'code/preprocess')
+sys.path.append(allds_home  + 'code/recommender')
 
 from topic_modeling import TopicModel, read_articles
 from ArticleProceser import   ascii_text
 from recommender import Recommender, get_rank, make_diagnostic_plots, pre_clean_text
 
-from configobj import ConfigObj
-config = ConfigObj('../allds.config')
-allds_home = config['allDS_home']
 data_home = allds_home + 'data/'
 dummy_result_pkl = 'dummy_results.pkl'
 username = 'DSI6'
@@ -234,4 +235,4 @@ def browse():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=6969, debug=True)
+    app.run(host='0.0.0.0', port=80, debug=True)

@@ -62,8 +62,10 @@ class Recommender(object):
         X_article_fname = data_home + self.model_name + 'X_articles.csv'
 
         if os.path.exists(df_article_fname):
+	    print 'found picklet file %s' df_article_fname
             self.load_articles_from_pickle(df_article_fname, W_article_fname, X_article_fname)
         else:
+	    print 'no pickle file %s. read from mongodb' % df_article_fname
             self.df_articles = read_articles()
             self.W_articles, tokenized_articles, self.X_articles = self.topic_model.transform_bodytext2topics(self.df_articles.body_text,1)
 
