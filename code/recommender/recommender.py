@@ -91,10 +91,13 @@ class Recommender(object):
 
     def load_articles_from_pickle(self, df_article_fname, W_article_fname, X_article_fname):
         with open(df_article_fname, 'r') as in_fh:
+            print df_article_fname
             self.df_articles = pickle.load(in_fh)
         with open(W_article_fname, 'r') as in_fh:
+            print W_article_fname
             self.W_articles = pickle.load (in_fh)
         with open(X_article_fname, 'r') as in_fh:
+            print X_article_fname
             self.X_articles = pickle.load(in_fh)
 
     def calculate_recommendations(self, W, test_X2, input_name):
