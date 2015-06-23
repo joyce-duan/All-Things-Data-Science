@@ -21,22 +21,26 @@ import pickle
 #import ipdb
 
 from configobj import ConfigObj
-config = ConfigObj('../../allds.config')
+config = ConfigObj('allds.config')
 allds_home = config.get('allDS_home', '/Users/joyceduan/Documents/git/All-Things-Data-Science/')
 data_home = allds_home + 'data/'
-
-#sys.path.append('../model')
-#sys.path.append('../preprocess')
 
 sys.path.append(allds_home+'code/model')
 sys.path.append(allds_home+'code/preprocess')
 
 from topic_modeling import TopicModel, read_articles
 from ArticleProceser import   ascii_text
-#from nmf import run_nmf, get_top_topics_terms
 
 class Recommender(object):
     def __init__(self, model_name , func_tokenizer, func_stemmer):
+        '''
+            - INPUT: 
+                model_name   str
+                func_tokenizer  tokenizer used in the model_name
+                func_stemmer   stemmer used in the model_name
+            - Post-condition:
+                 self.df_articles, self.W_articles, self.X_articles
+        '''
         if model_name == '':
             model_name = 'v2_2'
         self.top_k_recommend = 5
@@ -62,10 +66,10 @@ class Recommender(object):
         X_article_fname = data_home + self.model_name + 'X_articles.csv'
 
         if os.path.exists(df_article_fname):
-	    print 'found picklet file %s' df_article_fname
+	    print 'found picklet files %s' % df_article_fname
             self.load_articles_from_pickle(df_article_fname, W_article_fname, X_article_fname)
         else:
-	    print 'no pickle file %s. read from mongodb' % df_article_fname
+	    print 'no pickle files %s. read from mongodb' % df_article_fname
             self.df_articles = read_articles()
             self.W_articles, tokenized_articles, self.X_articles = self.topic_model.transform_bodytext2topics(self.df_articles.body_text,1)
 
@@ -95,14 +99,15 @@ class Recommender(object):
 
     def calculate_recommendations(self, W, test_X2, input_name):
         '''
-            self.X_articles
-            self.W_articles
-            self.df_articles
+            - precondisions: all articles to be searched
+                self.X_articles
+                self.W_articles
+                self.df_articles
             - INPUT: 
                 W:  1 x n_topics
                 test_X2:  1 x n_features
             - OUTPUT: 
-                df_recom
+                df_recom from get_recommendation_dataframe
         '''
         top_k_recommend = self.top_k_recommend 
         max_rank = self.max_rank
@@ -285,7 +290,6 @@ def pre_clean_text(func_tokenizer, data2):
     for w in tokenized_slacks:#[0]:
         if  re.search('[a-zA-Z]',w) and '//' not in w and 'sf_ds' not in w and w not in words_exclude:
             cleaned_slack.append(w)
-    #print cleaned_slack
     return ' '.join(cleaned_slack)
 
 def get_rank(array):

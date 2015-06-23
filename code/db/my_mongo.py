@@ -12,6 +12,7 @@ atds_dbname = 'atds'
 links_collection_name = 'links'
 articles_collection_name = 'articles'
 
+import sys, os # these you almost always have...
 
 import requests
 from pymongo import MongoClient
@@ -19,6 +20,11 @@ from bs4 import BeautifulSoup
 import time
 from pymongo.errors import DuplicateKeyError, CollectionInvalid
 import re
+
+def WHERE( back = 0 ):
+    frame = sys._getframe( back + 1 )
+    return "%s/%s %s()" % ( os.path.basename( frame.f_code.co_filename ),
+                        frame.f_lineno, frame.f_code.co_name )
 
 class MyMongo(object):
 	'''
@@ -32,7 +38,7 @@ class MyMongo(object):
 		self.link_url_field_name = 'url'
 		if self.dbname == 'nytimes':
 			self.link_url_field_name = 'web_url'
-
+		print WHERE(1)
 		print 'connected to database %s, collection name: %s ' % (self.dbname, self.links_collection_name)
 
 		self.client = MongoClient()
