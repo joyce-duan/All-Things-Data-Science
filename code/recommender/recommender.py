@@ -20,6 +20,7 @@ import os
 import pickle
 #import ipdb
 
+sys.stdout.flush()
 from configobj import ConfigObj
 config = ConfigObj('allds.config')
 allds_home = config.get('allDS_home', '/Users/joyceduan/Documents/git/All-Things-Data-Science/')
@@ -29,7 +30,7 @@ sys.path.append(allds_home+'code/model')
 sys.path.append(allds_home+'code/preprocess')
 
 from topic_modeling import TopicModel, read_articles
-from ArticleProceser import   ascii_text
+from ArticleProceser import  clean_articles, fit_tfidf, transform_tfidf, ascii_text
 
 class Recommender(object):
     def __init__(self, model_name , func_tokenizer, func_stemmer):
@@ -85,6 +86,7 @@ class Recommender(object):
 
         #print topic_model.sorted_topics_for_articles(W_articles[:1,:])
         self.sorted_topics_articles = self.topic_model.sorted_topics_for_articles(self.W_articles)
+
         t1 = time.time() # time it
         print 'topics for articles:'
         print "finished in  %4.4f min for %s " %((t1-t0)/60,'topics of articles\n')
@@ -105,9 +107,17 @@ class Recommender(object):
         with open(W_article_fname, 'r') as in_fh:
             print W_article_fname
             self.W_articles = pickle.load (in_fh)
+
+        '''
+        MemoryError on EC2 
         with open(X_article_fname, 'r') as in_fh:
             print X_article_fname
             self.X_articles = pickle.load(in_fh)
+        '''
+        print 'hack to calculate tfidf'
+        self.X_articles, tokenized_articles = transform_tfidf(self.topic_model.vectorizer, self.df_articles.body_text,\
+            self.topic_model.func_tokenizer,self.topic_model.func_stemmer)
+        del tokenized_articles
 
     def calculate_recommendations(self, W, test_X2, input_name):
         '''
