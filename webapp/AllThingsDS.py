@@ -61,7 +61,7 @@ my_title = '''<html>
             <title>Article Recommender </title>
         </head>
         '''
-
+sys.stdout.flush()
 # OUR HOME PAGE
 #============================================
 # home page describing the project tbd

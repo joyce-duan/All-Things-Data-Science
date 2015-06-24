@@ -88,7 +88,8 @@ def fit_tfidf(docs, kw_tfidf, func_tokenizer, func_stemmer):
     documents = [' '.join(article) for article in tokenized_articles]
     vectorizer =  vectorizer.fit(documents)
 
-    vectors_doc = vectorizer.transform(documents).todense()
+    #vectors_doc = vectorizer.transform(documents).todense()
+    ectors_doc = vectorizer.transform(documents)
     return vectorizer, vectors_doc, tokenized_articles
 
 def transform_tfidf(vectorizer, docs, func_tokenizer,func_stemmer):
@@ -99,8 +100,8 @@ def transform_tfidf(vectorizer, docs, func_tokenizer,func_stemmer):
     '''
     tokenized_articles = [tokenize(doc, func_tokenizer, func_stemmer) for doc in docs]
     documents = [' '.join(article) for article in tokenized_articles]
-    return vectorizer.transform(documents).todense(), tokenized_articles
-
+    #return vectorizer.transform(documents).todense(), tokenized_articles
+    return vectorizer.transform(documents), tokenized_articles
 
 def format_article(i, df2):
     n_chars = 500

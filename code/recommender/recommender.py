@@ -139,7 +139,10 @@ class Recommender(object):
         # cal simmilarity to all articles
         i_article = 0
         t0 = time.time()
-        cosine_similarities = linear_kernel(self.X_articles, test_X2[i_article,:]).flatten()
+        
+        #cosine_similarities = linear_kernel(self.X_articles, test_X2[i_article,:]).flatten()
+        cosine_similarities = linear_kernel(self.X_articles, test_X2[0:1]).flatten()
+
         cosin_simi_latent_topics = linear_kernel(self.W_articles, W[i_article,:]).flatten()
         cosine_similarities_rank = get_rank(cosine_similarities)
         cosin_simi_latent_topics_rank = get_rank(cosin_simi_latent_topics )
@@ -213,7 +216,8 @@ class Recommender(object):
         # summary of input
         top_n = 50
         print "top %i most frequenct features in input %s" % (top_n, fname)
-        sorted_feature_indexes = np.argsort(test_X2, axis=1)
+        test_X2_dense = test_X2.todense()
+        sorted_feature_indexes = np.argsort(test_X2_dense, axis=1)
         #print test_X2[desc_feature_indexes[:top_n]]
         features = self.topic_model.vectorizer.get_feature_names()
         i_article = 0
@@ -221,7 +225,7 @@ class Recommender(object):
         top_features_list = []
         for i in desc_feature_indexes[:top_n] :
             #top_features_list.append('%s (%.2f)' % (features[i], test_X2[i_article,i]))
-            top_features_list.append((features[i], test_X2[i_article,i]))
+            top_features_list.append((features[i], test_X2_dense[i_article,i]))
         #print ', '.join(top_features_list)
         return W, tokenized_slacks2, test_X2, top_features_list
 

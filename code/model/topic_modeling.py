@@ -129,6 +129,7 @@ class TopicModel(object):
             print '!!!!erroor loading file %s' % vectorizer_fname            
 
         try:
+            print topics_fname
             with open(topics_fname,'r') as in_fh:
                 t = pd.read_csv(in_fh, sep=',',header=None)
                 t.columns=['i','name']
