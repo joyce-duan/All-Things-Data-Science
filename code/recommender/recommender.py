@@ -68,7 +68,7 @@ class Recommender(object):
 
         if os.path.exists(df_article_fname):
 	    print 'found picklet files %s' % df_article_fname
-            self.load_articles_from_pickle(df_article_fname, W_article_fname, X_article_fname)
+            self.load_articles_from_pickle(df_article_fname, W_article_fname, X_article_fname, dict_article_fname)
         else:
 	    print 'no pickle files %s. read from mongodb' % df_article_fname
             self.df_articles = read_articles()
@@ -92,13 +92,13 @@ class Recommender(object):
     def get_topic_names(self):
         return self.topic_model.topic_names
 
-    def load_articles_from_pickle(self, df_article_fname, W_article_fname, X_article_fname):
+    def load_articles_from_pickle(self, df_article_fname, W_article_fname, X_article_fname, dict_article_fname):
         ''' 
         with open(df_article_fname, 'r') as in_fh:
             print df_article_fname
             self.df_articles = pickle.load(in_fh)
         ''' 
-        with open(dict_aritcle_fname, 'r') as in_fh:
+        with open(dict_article_fname, 'r') as in_fh:
             print dict_article_fname
             dict_articles = pickle.load(in_fh)
             self.df_articles = pd.DataFrame(dict_articles)
