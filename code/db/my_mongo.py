@@ -91,7 +91,9 @@ class MyMongo(object):
 		'''
 		get the attributes of article by cleaned_url
 			- INPUT:
-			- OUTPUT:  dictionary: article_dict[url] = (title)
+			- OUTPUT:  
+				dictionary: article_dict['url'] = (title)
+				dictionary article_dt['dt'] = str
 		'''
 
 		query = {self.link_url_field_name :{'$exists':1}, 'title':{'$exists':1}}
@@ -137,10 +139,10 @@ class MyMongo(object):
 	def close(self):
 		self.client.close()
 '''
-class NytimesMongo(object):
+#class NytimesMongo(object):
 
-def get_mongodb_collections(dbname ):#, links_collection_name, articles_collection_name):
-	client = MongoClient()
+#def get_mongodb_collections(dbname ):#, links_collection_name, articles_collection_name):
+#	client = MongoClient()
 
 	# Initiate Database
 '''
