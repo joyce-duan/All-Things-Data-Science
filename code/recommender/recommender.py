@@ -108,8 +108,9 @@ class Recommender(object):
             print W_article_fname
             self.W_articles = pickle.load (in_fh)
 
-        '''
-        MemoryError on EC2 
+        
+        #MemoryError on EC2 
+        print X_article_fname
         with open(X_article_fname, 'r') as in_fh:
             print X_article_fname
             self.X_articles = pickle.load(in_fh)
@@ -118,6 +119,7 @@ class Recommender(object):
         self.X_articles, tokenized_articles = transform_tfidf(self.topic_model.vectorizer, self.df_articles.body_text,\
             self.topic_model.func_tokenizer,self.topic_model.func_stemmer)
         del tokenized_articles
+        '''
 
     def calculate_recommendations(self, W, test_X2, input_name):
         '''
