@@ -1,4 +1,6 @@
-
+'''
+base class to extract all the visible texts from html files; ArticleProceser.py generally works better than this one.
+'''
 from get_links import get_mongodb_collections
 import math
 import random
@@ -96,9 +98,6 @@ class Processer(object):
 			print article_id, a['url']
 			str_content = self.content_extract_func(a[name_article_html])
 			self.articles_collection.update({'_id': article_id}, {'$set': {name_textcontent:str_content }})
-
-
-
 
 if __name__ == '__main__':
 	p = Processer()

@@ -1,29 +1,12 @@
 
 import requests
 
-def single_query_v0(url):
-	'''
-	first version; depreciated; use singe_query instead
-	get raw html of url
-		- INPUT: string url
-		- OUTPUT:  requests.models.Response
-	'''
-	#response = None
-	try:
-		response = requests.get(url)
-		if response.status_code != 200:
-			print 'WARNING', url,' ', response.status_code
-		else:
-			return response  # 
-	except:
-		print 'invalid url:  url'
-
-
 def singel_query_raw_html_all_methods(url):
 	'''
-	try all the methods to get raw_html
+	use all the methods to get raw_html
+
 		- INPUT: url string
-		- OUTPUT: raw_html '' if none found
+		- OUTPUT: raw_html  (in unicdoe); '' if none found
 	'''
 	response = single_query(url)
 	
@@ -37,13 +20,19 @@ def singel_query_raw_html_all_methods(url):
 		else:
 			if response.status_code == 200:
 				raw_html = response.text
+	try:
+		raw_html = raw_html.decode('utf8')
+	except:
+		pass
 	return raw_html
 
 def single_query(url):
 	'''
-	INPUT:  
+	basic requests to get content of a url
+
+		INPUT:  
 		- url   string
-	OUTPUT:
+		OUTPUT:
 		- response object
 	'''
 	#response = None
@@ -57,11 +46,11 @@ def single_query(url):
 	except:
 		print 'invalid url:',  url
 
-
 def single_query_browser(url):
 	'''
 	as plan b, use mechanize to get html content of an url
-	use this if single_query gave response.status_code 403
+	if single_query gave response.status_code 403
+
 	INPUT:  
 		- url   string
 	OUTPUT:
@@ -105,3 +94,23 @@ def insert_links(links_collection, links, linksource='', dt_submit=None):# use t
 			links_collection.insert(d_allinfo)
 		except DuplicateKeyError:
 			print "Duplicate keys"
+
+def single_query_v0(url):  #depreciated
+	'''
+	first version; depreciated; use singe_query instead
+	get raw html of url
+
+		- INPUT: string url
+		- OUTPUT:  requests.models.Response
+	'''
+	#response = None
+	try:
+		response = requests.get(url)
+		if response.status_code != 200:
+			print 'WARNING', url,' ', response.status_code
+		else:
+			return response  # 
+	except:
+		print 'invalid url:  url'
+
+

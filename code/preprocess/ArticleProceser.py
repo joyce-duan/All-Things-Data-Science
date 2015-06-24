@@ -1,3 +1,6 @@
+'''
+feature generation from body_text
+'''
 from nltk.stem.snowball import SnowballStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -6,20 +9,21 @@ from nltk.stem.snowball import SnowballStemmer
 from nltk.stem.wordnet import WordNetLemmatizer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 import re
-
-'''
-feature generation from body_text
-'''
+from httplib import BadStatusLine
+from boilerpipe.extract import Extractor
 
 def clean_articles(cur_articles, articles_cleaned):
     '''
-    exclude *.pdf, youtube
-    standardize url (strip prefix for wayback machine)
+    read articles from mongodb and save in dictionary 
+            exclude *.pdf, youtube
+            standardize url (strip prefix for wayback machine)
+
         - INPUT:  
             cur_articles: cursor_articles, mongo query results
             articles_cleaned:  {}  
         - OUTPUT: 
-            none:  updated articles_cleaned
+            none:  updated articles_cleaned: 
+            articles_cleaned[url] = [len(body_text),body_text]
     '''
     articles = list(cur_articles)
     print '%d articles found' % len(articles)
@@ -129,6 +133,9 @@ def print_articles_2scores(idx, df2, sim, rating):
         print 
 
 def ascii_text(text):
+    '''
+    convert to ascii
+    '''
     words = text.split()
     cleaned_words = []
     for w in words:
@@ -139,6 +146,20 @@ def ascii_text(text):
         cleaned_words.append(t)
     return ' '.join(cleaned_words)
 
-
-
+def html_to_bodytext(raw_html):
+    '''
+    extract body text from raw html content
+        - INPUT: 
+            raw_html    str
+        - OUTPUT:
+            extracted_text    str
+    '''
+    try:
+        extractor = Extractor(extractor='ArticleExtractor', html=raw_html)
+        extracted_text = extractor.getText()
+        #l = extracted_text.split('\n')
+    # do something with page
+    except BadStatusLine:
+        print("could not extract body_text ")
+    return extracted_text
 

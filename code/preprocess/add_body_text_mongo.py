@@ -14,6 +14,7 @@ from configobj import ConfigObj
 config = ConfigObj('../allds.config')
 allds_home = config['allDS_home']
 sys.path.append(allds_home+'/code/db')
+
 from my_mongo import MyMongo
 from httplib import BadStatusLine
 from boilerpipe.extract import Extractor
@@ -36,5 +37,5 @@ if __name__ == '__main__':
 			#print(extracted_text)
 	    # do something with page
 		except BadStatusLine:
-			print("could not fetch %s" % urls)
+			print("could not extract body_text from id: %s  url: %s" % a_id, a['url'])
 	my_mongo.close()
