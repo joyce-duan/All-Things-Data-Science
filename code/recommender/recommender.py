@@ -62,6 +62,7 @@ class Recommender(object):
         # these include newest articles, which may not be used in model_name and related H
         t0 = t1
         df_article_fname = data_home + 'df_articles.pkl'
+        dict_article_fname = data_home + 'dict_articles.pkl'
         W_article_fname = data_home + self.model_name + 'W_articles.pkl'
         X_article_fname = data_home + self.model_name + 'X_articles.csv'
 
@@ -79,6 +80,8 @@ class Recommender(object):
                 pickle.dump(self.W_articles, out_fh)           
             with open(X_article_fname,'w') as out_fh:  
                 pickle.dump(self.X_articles, out_fh) 
+            with open(dict_article_fname,'w') as out_fh:
+                pickle.dump(self.df_articles.to_dict(), out_fh)
 
         #print topic_model.sorted_topics_for_articles(W_articles[:1,:])
         self.sorted_topics_articles = self.topic_model.sorted_topics_for_articles(self.W_articles)
@@ -90,9 +93,15 @@ class Recommender(object):
         return self.topic_model.topic_names
 
     def load_articles_from_pickle(self, df_article_fname, W_article_fname, X_article_fname):
+        ''' 
         with open(df_article_fname, 'r') as in_fh:
             print df_article_fname
             self.df_articles = pickle.load(in_fh)
+        ''' 
+        with open(dict_aritcle_fname, 'r') as in_fh:
+            print dict_article_fname
+            dict_articles = pickle.load(in_fh)
+            self.df_articles = pd.DataFrame(dict_articles)
         with open(W_article_fname, 'r') as in_fh:
             print W_article_fname
             self.W_articles = pickle.load (in_fh)
@@ -533,7 +542,8 @@ if __name__ == '__main__':
     recommender = Recommender(model_name, func_tokenizer, func_stemmer)
 
     #read in input
-    cleaned_slack = read_slack_msgs(func_tokenizer, fname=fname)
+    #cleaned_slack = read_slack_msgs(func_tokenizer, fname=fname)
+    cleaned_slack = 'spark hadoop big data'
     W, tokenized_slacks2, test_X2, top_features_list = recommender.process_input(cleaned_slack)
     sorted_topics = recommender.topic_model.sorted_topics_for_articles(W)
 
