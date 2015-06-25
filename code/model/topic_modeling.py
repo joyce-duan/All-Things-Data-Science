@@ -6,7 +6,7 @@ NMF mixing up articles and topics???
 from configobj import ConfigObj
 config=ConfigObj('allds.config')
 #config = ConfigObj('../../allds.config')
-print config
+#print config
 allds_home = config.get('allDS_home','/Users/joyceduan/Documents/git/All-Things-Data-Science/')
 data_home = allds_home + 'data/'
 
@@ -222,7 +222,7 @@ class TopicModel(object):
         #idx_df = list(self.df.index)
 
         t0 = time.time() # time it
-        self.W, self.H, nmf_model = run_nmf(self.X2 )
+        self.W, self.H, nmf_model = run_nmf(self.X2, self.kw_nmf)
         self.nmf_model = nmf_model
         t1 = time.time() # time it
         print "finished in  %4.4fmin for %s " %((t1-t0)/60,'run_nmf')

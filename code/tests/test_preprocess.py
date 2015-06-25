@@ -28,14 +28,14 @@ def test_boilerpipe():
 	extracted_html = extractor.getHTML()
 	extracted_text = extractor.getText()
 
-	print 'function: %s ' % inspect.stack()[0][3]
+	print '\nfunction: %s ' % inspect.stack()[0][3]
 	print 'extracted  html: %i text: %i' % (len(extracted_html), len(extracted_text))
 	print ''
 	n.assert_greater(len(extracted_text), min_str_length)
 
 def test_html_to_bodytext():
 	in_fname = 'data/test.html'
-	print 'function: %s ' % inspect.stack()[0][3]
+	print '\nfunction: %s ' % inspect.stack()[0][3]
 
 	#url = 'http://petewarden.com/2015/04/20/why-gemm-is-at-the-heart-of-deep-learning/'
 	with open(in_fname, 'r') as in_fh:

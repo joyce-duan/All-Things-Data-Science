@@ -19,7 +19,7 @@ print allds_home  + 'code/scraper'
 from Scraper import singel_query_raw_html_all_methods
 
 def test_get_content():
-	print 'function: %s ' % inspect.stack()[0][3]
+	print '\nfunction: %s ' % inspect.stack()[0][3]
 
 	url = 'http://petewarden.com/2015/04/20/why-gemm-is-at-the-heart-of-deep-learning/'
 	out_fname = 'data/test.html'
@@ -34,7 +34,7 @@ def test_get_content():
 	print ''
 
 def test_2():
-	print 'function: %s ' % inspect.stack()[0][3]
+	print '\nfunction: %s ' % inspect.stack()[0][3]
 	print ''
 
 if __name__=="__main__":

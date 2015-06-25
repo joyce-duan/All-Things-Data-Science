@@ -2,7 +2,7 @@ from sklearn.decomposition import NMF
 import numpy as np
 import pickle
 
-def run_nmf(X, **kwargs):
+def run_nmf(X, kwargs = {}):
     '''
     NMF on the TF-IDF feature matrix to create a topic model.
         - INPUT:  
@@ -16,6 +16,7 @@ def run_nmf(X, **kwargs):
     if 'n_components' in kwargs:
         pass
     else: kwargs['n_components'] = 20
+    print 'run_nmf kwargs: ', kwargs
     nmf = NMF(**kwargs)
     W = nmf.fit_transform(X)
     H = nmf.components_
