@@ -30,9 +30,6 @@ sys.path.append(allds_home  + 'code/model')
 sys.path.append(allds_home  + 'code/recommender')
 print allds_home + 'code/db'
 #print allds_home  + 'code/recommender'
-#sys.path.append('../preprocess')
-#sys.path.append('../model')
-
 
 from my_mongo import MyMongo
 from ArticleProceser import  clean_articles, fit_tfidf, transform_tfidf, ascii_text
@@ -167,7 +164,7 @@ class TopicModel(object):
 
         return W, tokenized_articles, vectorized_X
  
-    def fit_featurize(self, df):
+    def fit_features(self, df, testing = 0):
         '''
         tokenzie and preprocess df.body_text
         generate tifidf, fitering
@@ -178,7 +175,8 @@ class TopicModel(object):
                 self.vectorizer
         '''
         self.df = df
-
+        nrows = df.shape[0]
+        print 'df shape' , df.shape
         txt_list = df.body_text
         self.vectorizer, vectorized_X, tokenized_articles = fit_tfidf(txt_list, self.kw_tfidf, self.func_tokenizer, self.func_stemmer)
 
@@ -188,23 +186,29 @@ class TopicModel(object):
         cond = df['len'] >= 50  # only keeps articles with at least 50 words
         df = df[cond]
         df2 = df
-        irows = [i for i in xrange(vectorized_X.shape[0]) if cond[i]]
+        self.df = df2
+        irows = [i for i in xrange(nrows) if cond[i]]
         self.X2 =vectorized_X[np.ix_(irows)]
+        #self.X2 = vectorized_X.tocsr()[irows,:]
+        print type(self.X2)
         self.idx_in_model = irows
 
-        url_list2 = df2['url']
+        url_list2 = self.df['url']
         #df2.head(2)
+        '''
+        print 'after filtering:'
         print len(url_list2)
-        print df2.shape
+        print self.df.shape
         print self.X2.shape
 
-        print df2['uri'].nunique()
-        print pd.value_counts(df2['uri'])[:15]
-        print 1.0 *pd.value_counts(df2['uri'])[:8].sum()/df2.shape[0]
-        print df2.uri.nunique()
+        print self.df['uri'].nunique()
+        print pd.value_counts(self.df['uri'])[:15]
+        print 1.0 *pd.value_counts(self.df['uri'])[:8].sum()/self.df.shape[0]
+        print self.df.uri.nunique()
 
         print self.df.shape
         print self.df.columns
+        '''
         #print self.df.head(2)
 
     def fit_analyze_nmf(self):
@@ -240,7 +244,7 @@ class TopicModel(object):
 
     def get_best_topic_per_article(self):
         '''
-        get the best topic for each article 
+        get the one best topic for each article 
             - INPUT: self.W
             - OUTPUT: self.best_topic_for_articles n_articles x 2   [i_best_topic, topic_w]
         '''
@@ -273,7 +277,7 @@ class TopicModel(object):
 
     def plot_hist_weight_best_topic_per_article(self):   
         '''
-
+        plot historgram of weight of the best one topic for all the articles
         '''
         self.get_best_topic_per_article()
         fig = plt.figure(figsize=(8,4))
@@ -312,11 +316,12 @@ class TopicModel(object):
         model_name = self.model_name
         df2 = self.df
 
+        print df2.shape, W_t.shape, len(topic_terms)
         #model_name, n_top_articles, W_t,topic_terms, n_top_terms 
         with open(model_name+'.html','w') as out_fh:
             out_fh.write('<html>\n<body>')
             for topic_idx, article_w in enumerate(W_t):
-                out_fh.write("<h1>Topic #%d: </h1>\n" % topic_idx)
+                out_fh.write("<h3>Topic #%d: </h3>\n" % topic_idx)
 
                 #    for i, topic in enumerate(topic_terms):
                 terms = topic_terms[topic_idx]
@@ -326,17 +331,20 @@ class TopicModel(object):
                     txt_list.append('%s (%.2f)' % (item[0], item[1]))
                 out_fh.write( '<p><strong>top terms: ' + ' '.join(txt_list) +"</strong></p>\n")
 
-                out_fh.write('-----------------------------------<br>\n')
+                out_fh.write('<p>-----------------------------------<br>\n')
                 #print article_w.shape
                 idx_article_topn = article_w.argsort()[:-n_top_articles - 1:-1]
+                print 'topic #:', topic_idx
                 for i, idx in enumerate(idx_article_topn):
+
                     url = df2.iloc[idx]['url']
+                    print i, idx, url
                     #title_this = article_dict_all.get(url,'')
                     title_this = df2.iloc[idx]['title']
                     title_this_cleaned = ascii_text(title_this) 
                     if title_this_cleaned == '':
                         title_this_cleaned = url
-                    out_fh.write( '<p> ' + str(i) + '. (%.2f))'% article_w[idx] +'</p>\n' )
+                    out_fh.write( '<p> ' + str(i) + '. (%.2f)'% article_w[idx] +'</p>\n' )
                     out_fh.write( '<a href="' + url +'" target="_blank"> %s </a>  <br>\n' % title_this_cleaned  )
                     
                     body_text_str = df2.iloc[idx]['body_text'][:400]
@@ -370,7 +378,7 @@ class TopicModel(object):
         centroids = []
         for i in xrange(n_clusters + 1):
             cond = self.clusters == i
-            arr = self.X2[cond]
+            arr = self.X2.todense()[cond]
             #length = arr.shape[0]
             c = np.mean(arr, axis = 0)
             centroids.append(c)
@@ -384,8 +392,9 @@ class TopicModel(object):
         self.cal_centroid()
         n_clusters = np.max(self.clusters)
         #fig = plt.figure(figsize=(20,8))
-        centroid_overall = np.mean(self.X2, axis = 0)
-        sim = linear_kernel(centroid_overall, self.X2)
+        X2_dense = self.X2.todense()
+        centroid_overall = np.mean(X2_dense, axis = 0)
+        sim = linear_kernel(centroid_overall, X2_dense)
         max_sim = np.max(sim)
         min_sim = np.min(sim)
 
@@ -401,7 +410,7 @@ class TopicModel(object):
 
         for i in xrange(n_clusters + 1):
             cond = self.clusters == i
-            arr = self.X2[cond]
+            arr = X2_dense[cond]
             sim = linear_kernel(self.centroids[i], arr)
             axs[i_plot].hist(sim.flatten(), alpha=0.2)#, ax=axs[i_plot])
             axs[i_plot].set_xlim(min_sim, max_sim)
@@ -432,7 +441,7 @@ def plot_mds(data_m, title, distance_metric):
     plt.show()
 
 
-def read_articles():
+def read_articles():  
     '''
     ??? should this be moved to preprocess module
     read all articles as dataframe from mongodb collection 'articles'
@@ -458,18 +467,18 @@ def read_articles():
     #article_dict_all = dict(article_dict)
     df['title'] = df['url'].map(lambda x: article_dict.get(x,'Unknown'))
     df['uri'] = df['url'].map(lambda x: parse_url(x).host)
+    df['dt'] = df['url'].map(lambda x: article_dt.get(x, ''))
 
     my_mongo.close()
-
     return df
 
 def run_model(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer):
     '''
     run model from read 'body_text' from mongo db to fit and summarize NMF topics
     '''
-    topic_model = TopicModel(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer)
-    df = read_data()
-    topic_model.featurize(df)
+    topic_model = TopicModel(model_name, func_stemmer, func_tokenizer, kw_tfidf, kw_nmf)
+    df = read_articles()
+    topic_model.fit_features(df)
     topic_model.fit_analyze_nmf()
     #pickle.dump(topic_model, open(model_name+'_all.pkl', 'wb'))
 
@@ -546,6 +555,9 @@ def tune_hyper_params():
 
 
 def test_run_modeler():
+    '''
+    assign articles to topics using existing topic model
+    '''
     model_name = 'v2_2'
     func_tokenizer = TfidfVectorizer(stop_words = 'english').build_tokenizer()
     func_stemmer = PorterStemmer()
@@ -558,7 +570,24 @@ def test_run_modeler():
     sorted_topics = topic_model.sorted_topics_for_articles(W) 
 
 if __name__ == '__main__':
-    test_run_modeler()
+    #test_run_modeler()
 
     #tune_hyper_params()
+
+    nmx_max_iter = 6000
+    model_name = 'run3_1'
+    #func_stemmer = PorterStemmer()
+    #func_tokenizer = word_tokenize
+    #kw_tfidf = {'max_df': 0.90, 'stop_words': 'english', 'min_df': 10,\
+    #            'tokenizer': func_tokenizer, 'ngram_range':(1,3)}                
+    kw_nmf = {'n_components': 40, 'max_iter': nmx_max_iter}
+
+    kw_tfidf = {'stop_words':'english', 'ngram_range':(1,3), 'min_df':10}
+    func_tokenizer = TfidfVectorizer(stop_words = 'english').build_tokenizer()
+    func_stemmer = PorterStemmer()
+
+    run_model(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer)
+
+
+
 

@@ -35,6 +35,9 @@ from ArticleProceser import  clean_articles, fit_tfidf, transform_tfidf, ascii_t
 class Recommender(object):
     def __init__(self, model_name , func_tokenizer, func_stemmer):
         '''
+            - Pre-condition: 
+              pickle files or mongodb
+                    data_home/ : 'dict_articles.pkl',  'df_articles.pkl', self.model_name + 'W_articles.pkl' self.model_name + 'X_articles.csv'
             - INPUT: 
                 model_name   str
                 func_tokenizer  tokenizer used in the model_name

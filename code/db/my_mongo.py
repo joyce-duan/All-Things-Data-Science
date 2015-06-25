@@ -38,7 +38,7 @@ class MyMongo(object):
 		self.link_url_field_name = 'url'
 		if self.dbname == 'nytimes':
 			self.link_url_field_name = 'web_url'
-		print WHERE(1)
+		print 'initiated MyMongo class instance from ', WHERE(1)
 		print 'connected to database %s, collection name: %s ' % (self.dbname, self.links_collection_name)
 
 		self.client = MongoClient()

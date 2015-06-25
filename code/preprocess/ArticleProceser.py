@@ -74,13 +74,39 @@ def tokenize(doc, func_tokenizer, func_stemmer):
         stemmed_word = [func_stemmer.stem(word) for word in words ]
         return [w for w in stemmed_word if len(w) >=3 ]
 
+def keep_word(word):
+    word = word.strip()
+    url_pat = ['.io/', '.com/', '.org/', '.edu/']
+    stop_words_2 = ['this']
+    if word in stop_words_2:
+        return False
+    if word[:4] == 'http' or word[:3] == 'www' or word[:5] == 'buff.':
+        return False
+    has_url_pat = [t in word for t in url_pat]
+    if sum(has_url_pat) > 0:
+        return False
+    else:
+        return True
+
+def normalize_doc(docs):
+    '''
+    exclude url links, and stop words
+    '''
+    docs_new = []
+    for doc in docs:
+        doc = doc.strip().lower()
+        words = re.split("(\s+)", doc) 
+        #print words
+        words_new = [w.strip() for w in words if keep_word(w)]
+        docs_new.append(' '.join(words_new))
+    return docs_new
 
 def fit_tfidf(docs, kw_tfidf, func_tokenizer, func_stemmer):
     '''
-        - INPUT: X. list of string
+        - INPUT: docs list of string
         - OUPUT: list of list
     '''
-    
+    docs = normalize_doc(docs)
     tokenized_articles = [tokenize(doc, func_tokenizer, func_stemmer) for doc in docs]
 
 
@@ -93,7 +119,7 @@ def fit_tfidf(docs, kw_tfidf, func_tokenizer, func_stemmer):
     vectorizer =  vectorizer.fit(documents)
 
     #vectors_doc = vectorizer.transform(documents).todense()
-    ectors_doc = vectorizer.transform(documents)
+    vectors_doc = vectorizer.transform(documents)
     return vectorizer, vectors_doc, tokenized_articles
 
 def transform_tfidf(vectorizer, docs, func_tokenizer,func_stemmer):
