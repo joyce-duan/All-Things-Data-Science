@@ -245,7 +245,7 @@ def browse():
     """
     explore topic trends
     """
-    return render_template("browse_mockup.html")
+    return render_template("browse.html")
 
 if __name__ == '__main__':
     port = 80  # http port on AWS
