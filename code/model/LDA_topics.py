@@ -422,21 +422,7 @@ def run_lda(texts, min_df = 5, 	num_topics = 20):
 	    	
 	return lda_model, topics_matrix, dictionary
 
-
-def test_run():
-
-	t0 = time.time() # time it
-	my_stop_words = TfidfVectorizer(stop_words = 'english').get_stop_words()
-	print '%i stop words ' % len(my_stop_words)
-
-	docs = []
-	for doc in df.tokens.values:
-		docs.append([w for w in doc if w not in my_stop_words])
-
-	lda_model, topics_matrix, dictionary = run_lda(docs, min_df = 5, num_topics = 20)
-	t1 = time.time() # time it
-	print "finish in  %4.4fmin for %s " %((t1-t0)/60,'LDA')
-
+def load_model_print_stats():
 	t0 = time.time() # time it
 	min_df = 5
 	dictionary = corpora.Dictionary(docs)
@@ -456,6 +442,46 @@ def test_run():
 
 	lda_topic_model.set_X2(X2)
 	lda_topic_model.plot_hist_d_to_centroid(min_w = 0.3)
+
+
+def test_run():
+	model_name = 'test_lda'
+	num_topics  = 20
+	t0 = time.time() # time it
+	my_stop_words = TfidfVectorizer(stop_words = 'english').get_stop_words()
+	print '%i stop words ' % len(my_stop_words)
+
+
+
+	docs = []
+	for doc in df.tokens.values:
+		docs.append([w for w in doc if w not in my_stop_words])
+
+	lda_model, topics_matrix, dictionary = run_lda(docs, min_df = 5, num_topics = num_topic)
+	t1 = time.time() # time it
+	print "finish in  %4.4fmin for %s " %((t1-t0)/60,'LDA')
+
+	#t0 = time.time() # time it
+	#min_df = 5
+	#dictionary = corpora.Dictionary(docs)
+	#dictionary.filter_extremes(no_below= min_df, no_above=0.99)
+
+	lda_topic_model = LDATopics(model_name)
+
+	lda_kw_dict = {'data':df,'lda_model':lda_model, 'dictionary':dictionary}
+	lda_topic_model.set_models(lda_kw_dict, num_topics=20, num_words=15 )
+	lda_topic_model.set_W()
+	lda_topic_model.set_H()
+
+	lda_topic_model.set_top_topics_terms()
+
+	lda_topic_model.print_topic_results_html()
+	lda_topic_model.plot_hist_weight_best_topic_per_article()
+
+	cutoff = lda_topic_model.get_summary_stats()
+
+	#lda_topic_model.set_X2(X2)
+	#lda_topic_model.plot_hist_d_to_centroid(min_w = 0.3)
 
 
 
