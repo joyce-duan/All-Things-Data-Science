@@ -40,6 +40,7 @@ class TopicSummarizer(object):
         self.W = W
         self.sorted_topics = sorted_topics
         self.topic_names = topic_names
+        self.exclude_i_orig = [18,17,19,2,5]
 
         self.add_features()
         self.assign_topics()
@@ -97,8 +98,11 @@ class TopicSummarizer(object):
 
         f = open(outfile,'w')
         f.write("itopic,narticles,i,topic_name\n")
-        for i_topic_display, idx  in enumerate(idx_sorted): #,val in enumerate(x):
-            f.write(str(i_topic_display)+','+str(y[idx])+','+str(idx)+ ','+ self.topic_names[idx]+'\n')
+        i_topic_display = 1
+        for i_topic_display0, idx  in enumerate(idx_sorted): #,val in enumerate(x):
+            if idx not in self.exclude_i_orig:
+                f.write(str(i_topic_display)+','+str(y[idx])+','+str(idx)+ ','+ self.topic_names[idx]+'\n')
+                i_topic_display = i_topic_display + 1
         f.close()
 
 
@@ -119,13 +123,16 @@ class TopicSummarizer(object):
         #columns to be written in csv file
         cond_has_date = self.df['pub_month_date_str'] != ''
         data = []
-        for i_topic_display, i_topic_orig in enumerate(idx_sorted):
-            cond = self.df['topic_sorted'] == i_topic_orig
-            d_thistopic = self.df[cond & cond_has_date][['pub_month_date_str','topic_sorted']]\
-            .groupby('pub_month_date_str').size().to_dict()
-            d_thistopic_all = [ (i_topic_display, m, d_thistopic.get(m,0), self.topic_names[i_topic_orig]) \
-            for m in df_monthly]
-            data.extend(d_thistopic_all)
+        i_topic_display = 1
+        for i_topic_display0, i_topic_orig in enumerate(idx_sorted):
+            if i_topic_orig not in self.exclude_i_orig:
+                cond = self.df['topic_sorted'] == i_topic_orig
+                d_thistopic = self.df[cond & cond_has_date][['pub_month_date_str','topic_sorted']]\
+                .groupby('pub_month_date_str').size().to_dict()
+                d_thistopic_all = [ (i_topic_display, m, d_thistopic.get(m,0), self.topic_names[i_topic_orig]) \
+                for m in df_monthly]
+                data.extend(d_thistopic_all)
+                i_topic_display = i_topic_display + 1
         df = pd.DataFrame(data)
         print 'df:', df.shape
         print df.head(5)
@@ -140,7 +147,7 @@ class TopicSummarizer(object):
         df2.to_csv(outfile, index=False)
 
     def write_data(self, outfile1, outfile2, outfile3):
-        #self.articles_topic(outfile1)
+        self.articles_topic(outfile1)
         #self.articles_per_month(outfile2)
         self.articles_bytopic_permonth(outfile3)
 

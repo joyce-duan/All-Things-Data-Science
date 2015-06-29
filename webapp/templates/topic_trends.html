@@ -122,9 +122,17 @@ var max_topics = 0
 var x = d3.scale.ordinal().rangeRoundBands([0, width], .1);
 var y = d3.scale.linear().range([height, 0]);
 
+var xLabels = ["jobs/companies","intro","career","deep learning","big data","python/R",
+"stats","books","algo examples","sports","analytics","algo intro","competitions","significant digits"
+, "Spark"]
+var formatXLabel = function(d) {
+    return xLabels[d-1]
+}
+
 var xAxis = d3.svg.axis()
               .scale(x)
-              .orient("bottom");
+              .orient("bottom")
+              .tickFormat(formatXLabel);
 
 var yAxis = d3.svg.axis()
               .scale(y)
@@ -138,13 +146,7 @@ var tip = d3.tip()
     .attr('class', 'd3-tip')
     .offset([-10, 0])
     .html(function(d) {
-       // return "<img src='static/topic_" + max_topics + "_" + d.ntopic +
-        //       ".png' style='width:120px'>"
-        //return "topic " + (d.itopic+1) + ": " + d["topic_name"] //.topic_name[d.itopic] 
-        //return d;
-        return "topic #"+(d.itopic+1)+": " + d['topicname'];
-        console.log(d)
-        //return d.data
+        return "topic #"+(d.itopic)+": " + d['topicname'];
         })
 
 var svg = d3.select("body").append("svg")
@@ -154,7 +156,6 @@ var svg = d3.select("body").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 svg.call(tip);
-
 
 /* 2nd plot svg2 */
 // Parse the date 
@@ -211,16 +212,24 @@ d3.csv('static/articles_per_topic.csv?_=' + Math.random(), type_data1, function(
 
 	// In the data file, ntopic starts from 0, x axis values here start from 1
     // range
-    x.domain(data.map(function(d) {return d.itopic + 1;}));
+    x.domain(data.map(function(d) {return d.itopic ;}));
     y.domain([0, d3.max(data, function(d) {return d.narticles;})]);
 
-    max_topics = d3.max(data, function(d) {return d.itopic + 1;})
+    max_topics = d3.max(data, function(d) {return d.itopic ;})
     console.log(max_topics)
 
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+        .call(xAxis)
+        .selectAll("text")  
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", function(d) {
+           // return "rotate(-65)" 
+       return "translate(" + this.getBBox().width/20 + "," + (-1 * this.getBBox().height/2) + ")rotate(-15)";  
+        });
 
     svg.append("g")
         .attr("class", "y axis")
@@ -237,7 +246,7 @@ d3.csv('static/articles_per_topic.csv?_=' + Math.random(), type_data1, function(
         .data(data)
         .enter().append("rect")
         .attr("class", "bar")
-        .attr("x", function(d) { return x(d.itopic + 1); })
+        .attr("x", function(d) { return x(d.itopic ); })
         .attr("width", x.rangeBand())
         .attr("y", function(d) { return y(d.narticles); })
         .attr("height", function(d) { return height - y(d.narticles); })
@@ -318,7 +327,7 @@ d3.csv('static/articles_per_topic.csv?_=' + Math.random(), type_data1, function(
             // after tooltip
             svg.append('rect')
                 .attr("class","selected_bar")
-                .attr("x", function(d) { return x(topic + 1); })
+                .attr("x", function(d) { return x(topic ); })
                 .attr("y", 291) //291)
                 //.attr("height", function(d) { return height - y(d.frequency)
                 .attr("width", x.rangeBand())
@@ -327,7 +336,7 @@ d3.csv('static/articles_per_topic.csv?_=' + Math.random(), type_data1, function(
                 .style("opacity", 0.5);
             
             svg.append('text')
-                .attr("x", function(d) { return x(topic + 1); })
+                .attr("x", function(d) { return x(topic); })
                 .attr("class", "selected_text")
                 .attr("y", 291) //291)
                 .attr("font-size","14px") // orange")
@@ -345,25 +354,6 @@ d3.csv('static/articles_per_topic.csv?_=' + Math.random(), type_data1, function(
             // clear tooltip
             //d3.selectAll("a.headline").remove()
             div.style("opacity", 0)
-
-            //show img of word cloud 
-            /*
-            svg.select("image.wordCloud")
-                   .attr("xlink:href", "static/white_space.png")
-                   */
-           //     .attr("xlink:href", "static/topic_" + max_topics + "_" +
-             //                       d.ntopic + ".png");
-
-            // responsive 2nd plot
-            /*
-            svg2.append("text")
-                .attr("class","title")
-                .attr("x", width*0.5-60)
-                .attr("y", 15)
-                .attr("font-size","18px")
-                .html("Percent of Articles per Month - <b>" + topicname ) //+ "</b>")
-            */
-                //.html("Percent of Articles per Month - <b>"+ topicname + "</b>")
 
             drawTopic(topic);
         };
@@ -453,7 +443,7 @@ var resetToolTip = function(d) {
 function type_data1(d) {
     d.itopic = +d.itopic
     d.narticles= +d.narticles;
-    d.topicname= d.topicname;
+    d.topicname= d.topic_name;
     return d;
 }
 
