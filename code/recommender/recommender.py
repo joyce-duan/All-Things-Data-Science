@@ -53,7 +53,7 @@ class Recommender(object):
         self.max_cosine_sim_tfidf = 0.5
 
         self.method = None # content or rating
-        self.max_len_body_text = 3000        
+        self.max_len_body_text = 600 #3000        
         self.model_name = model_name #'v2_2'
 
         t0 = time.time() # time it

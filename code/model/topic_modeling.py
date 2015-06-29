@@ -239,8 +239,8 @@ class TopicModel(object):
 
         self.print_topic_results_html()
         self.plot_hist_weight_best_topic_per_article()
-        cutoff = self.print_summary_stats()
-        self.plot_hist_d_to_centroid(min_w = cutoff)
+        #cutoff = self.print_summary_stats()
+        #self.plot_hist_d_to_centroid(min_w = cutoff)
 
     def get_best_topic_per_article(self):
         '''
@@ -408,7 +408,7 @@ class TopicModel(object):
         axs[i_plot].set_xlim(min_sim, max_sim)
         i_plot = i_plot + 1
 
-        for i in xrange(n_clusters + 1):
+        for i in xrange( n_clusters):
             cond = self.clusters == i
             arr = X2_dense[cond]
             sim = linear_kernel(self.centroids[i], arr)
@@ -492,64 +492,54 @@ def tune_hyper_params():
 
     '''
     nmx_max_iter= 6000 # 3000
-
     '''
-    model_name = 'v4'   # 3 snow  
-    kw_tfidf = {'max_df': 0.90, 'stop_words': 'english', 'min_df': 10,\
-                'tokenizer': None}                
-    kw_nmf = {'n_components': 20, 'max_iter': nmx_max_iter}
-    func_stemmer = PorterStemmer()
-    #func_stemmer = SnowballStemmer('english')
-    func_tokenizer = TfidfVectorizer(stop_words = 'english').build_tokenizer()
+    model_name = 'run3_4'   # 3 snow  
+    kw_tfidf = {'max_df': 0.99, 'stop_words': 'english', 'min_df': 10,\
+                 'ngram_range':(1,3)}                
+    kw_nmf = {'n_components': 30, 'max_iter': nmx_max_iter}
+    #func_stemmer = PorterStemmer()
+    func_stemmer = SnowballStemmer('english')
+    func_tokenizer = word_tokenize
     run_model(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer)   
     '''
-
-    # topic_model = TopicModel(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer)
-    # df = read_data()
-    # topic_model.featurize(df)
-    # topic_model.fit_analyze_nmf()
-    # pickle.dump(topic_model, open(model_name+'_all.pkl', 'wb'))
-
-
-    model_name = 'v5'
+    model_name = 'run3_5'
+    kw_tfidf = {'max_df': 0.99, 'stop_words': 'english', 'min_df': 10,\
+                 'ngram_range':(1,3)}                
+    kw_nmf = {'n_components': 30, 'max_iter': nmx_max_iter}
     func_stemmer = PorterStemmer()
     func_tokenizer = word_tokenize
-    kw_tfidf = {'max_df': 0.90, 'stop_words': 'english', 'min_df': 10,\
+    run_model(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer)
+
+    model_name = 'run3_6'
+    func_stemmer = PorterStemmer()
+    func_tokenizer = TfidfVectorizer(stop_words = 'english').build_tokenizer()
+    kw_tfidf = {'max_df': 0.90, 'stop_words': 'english', 'min_df': 20,\
                 'tokenizer': func_tokenizer, 'ngram_range':(1,3)}                
-    kw_nmf = {'n_components': 20, 'max_iter': nmx_max_iter}
+    kw_nmf = {'n_components': 30, 'max_iter': nmx_max_iter}
     run_model(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer)
 
 
-    model_name = 'v6'
+    model_name = 'run3_7'
     func_stemmer = PorterStemmer()
-    func_tokenizer = word_tokenize
-    kw_tfidf = {'max_df': 0.90, 'stop_words': 'english', 'min_df': 10,\
-                'tokenizer': func_tokenizer, 'ngram_range':(1,3)}                
+    func_tokenizer = TfidfVectorizer(stop_words = 'english').build_tokenizer()
+    kw_tfidf = { 'stop_words': 'english','ngram_range':(1,5), 'max_features':10000, 'min_df':20, 'max_df':0.9}
     kw_nmf = {'n_components': 40, 'max_iter': nmx_max_iter}
     run_model(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer)
 
 
-    model_name = 'v7'
+    model_name = 'run3_8'
     func_stemmer = PorterStemmer()
     func_tokenizer = word_tokenize
     kw_tfidf = { 'stop_words': 'english','ngram_range':(1,5), 'max_features':10000, 'min_df':20, 'max_df':0.9}
-    kw_nmf = {'n_components': 20, 'max_iter': nmx_max_iter}
+    kw_nmf = {'n_components': 40, 'max_iter': nmx_max_iter}
     run_model(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer)
 
 
-    model_name = 'v8'
-    func_stemmer = SnowballStemmer('english')
-    func_tokenizer = word_tokenize
-    kw_tfidf = { 'stop_words': 'english','ngram_range':(1,5), 'max_features':10000, 'min_df':20, 'max_df':0.9}
-    kw_nmf = {'n_components': 20, 'max_iter': nmx_max_iter}
-    run_model(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer)
-
-
-    model_name = 'v9'
+    model_name = 'run3_9'
     kw_tfidf = {'max_df': 0.90, 'stop_words': 'english', 'min_df': 10,\
-                'tokenizer': None}                
-    kw_nmf = {'n_components': 20, 'max_iter': nmx_max_iter}
-    func_stemmer = lambda x: x.lower()
+                'tokenizer': None, 'ngram_range':(1,3)}                
+    kw_nmf = {'n_components': 80, 'max_iter': nmx_max_iter}
+    func_stemmer =  PorterStemmer()
     func_tokenizer = TfidfVectorizer(stop_words = 'english').build_tokenizer()
     run_model(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer)
 
@@ -569,11 +559,7 @@ def test_run_modeler():
 
     sorted_topics = topic_model.sorted_topics_for_articles(W) 
 
-if __name__ == '__main__':
-    #test_run_modeler()
-
-    #tune_hyper_params()
-
+def test_1_run():
     nmx_max_iter = 6000
     model_name = 'run3_1'
     #func_stemmer = PorterStemmer()
@@ -589,5 +575,11 @@ if __name__ == '__main__':
     run_model(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer)
 
 
+if __name__ == '__main__':
+    #test_run_modeler()
+
+    tune_hyper_params()
+
+ 
 
 
