@@ -120,13 +120,10 @@ class MyMongo(object):
 			article_dt[url] = link.get('dt', t)
 		return article_dict, article_dt
 
-
-
 	def get_article_body_text(self, testing=0):
 		'''
 		get the url and body text
 			- OUTPUT: cursor
-			??? projection not working????
 		'''
 		query = {'body_text':{'$exists':1}, 'url':{'$exists':1}}
 		projection = {'body_text': 1, 'url':1}
@@ -138,16 +135,6 @@ class MyMongo(object):
 
 	def close(self):
 		self.client.close()
-'''
-#class NytimesMongo(object):
-
-#def get_mongodb_collections(dbname ):#, links_collection_name, articles_collection_name):
-#	client = MongoClient()
-
-	# Initiate Database
-'''
-
-
 
 if __name__ == '__main__':
 	my_mongo = MyMongo()

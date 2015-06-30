@@ -22,3 +22,4 @@ import sys
 sys.path.append(allds_home  + 'code/model')
 
 --- to test code on aws EC2
+modify allds.config to update the root directory

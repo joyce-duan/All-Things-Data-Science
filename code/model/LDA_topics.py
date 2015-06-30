@@ -5,10 +5,7 @@ from LdaTopics import BaseTopics, LDATopics, run_lda
 
 run_lda:  90 minutes for 1200 articles 
 
-to-do:
- - need tfidf for cluster centroid???
 '''
-
 
 import theano
 from gensim import corpora, models, similarities 
@@ -212,7 +209,6 @@ class BaseTopics(object):
 		n_clusters = np.max(self.clusters)
 		#fig = plt.figure(figsize=(20,8))
 
-
 		#multiple plot, subplots
 		ncols = 3
 		nrows = (n_clusters + 1) // ncols + ( ((n_clusters+1) % ncols)>0 )
@@ -330,42 +326,6 @@ class LDATopics(BaseTopics):
 			for i_topic, w_topic in w_this:
 				self.W[i_article,i_topic] = w_topic
 
-	'''
-	moved to base class
-	def set_top_topics_terms(self):
-	'''
-	'''
-		get the k_top_words for each topic
-			- INPUT:  self.H, self.top_word_features
-			- OUTPUT: self.topic_terms  list of dictionary 
-				each element: for article i, the dictonary of the weigths for top terms topics_dicts   
-				word:weight  (k_top_words most important terms for each topic)
-		
-
-		print 'set_top_topics_terms'
-		k_top_words = self.n_top_terms
-		self.topic_terms = []
-		n_topics = self.H.shape[0]
-
-		for i in xrange(n_topics):
-
-			v = self.H[i].flatten()
-			#print type(self.H), type(v), v.shape, type(self.top_word_features)
-			idx_sorted_topk= np.argsort(-1.0 * v)[:k_top_words]
-
-			#print idx_sorted_topk
-			#print self.top_word_features[idx_sorted_topk]
-			#print v[idx_sorted_topk]
-
-			#k_term, v = zip(*sorted(zip(self.top_word_features, self.H[i].flatten()),\
-			#                   key=lambda x: x[1])[:-k_top_words:-1])
-			#val_arr = np.array(v)
-			#norms = val_arr / np.sum(val_arr)
-			#topic_terms.append(dict(zip(k, norms * 100)))
-			terms_this_topic = zip(self.top_word_features[idx_sorted_topk],v[idx_sorted_topk]*100 )
-			#print dict(terms_this_topic)
-			self.topic_terms.append(dict(terms_this_topic))
-	'''
 	def get_summary_stats(self):
 		'''
 		print summary stats of weight of the best topic for each article
@@ -443,15 +403,12 @@ def load_model_print_stats():
 	lda_topic_model.set_X2(X2)
 	lda_topic_model.plot_hist_d_to_centroid(min_w = 0.3)
 
-
 def test_run():
 	model_name = 'test_lda'
 	num_topics  = 20
 	t0 = time.time() # time it
 	my_stop_words = TfidfVectorizer(stop_words = 'english').get_stop_words()
 	print '%i stop words ' % len(my_stop_words)
-
-
 
 	docs = []
 	for doc in df.tokens.values:
@@ -460,11 +417,6 @@ def test_run():
 	lda_model, topics_matrix, dictionary = run_lda(docs, min_df = 5, num_topics = num_topic)
 	t1 = time.time() # time it
 	print "finish in  %4.4fmin for %s " %((t1-t0)/60,'LDA')
-
-	#t0 = time.time() # time it
-	#min_df = 5
-	#dictionary = corpora.Dictionary(docs)
-	#dictionary.filter_extremes(no_below= min_df, no_above=0.99)
 
 	lda_topic_model = LDATopics(model_name)
 
@@ -479,10 +431,6 @@ def test_run():
 	lda_topic_model.plot_hist_weight_best_topic_per_article()
 
 	cutoff = lda_topic_model.get_summary_stats()
-
-	#lda_topic_model.set_X2(X2)
-	#lda_topic_model.plot_hist_d_to_centroid(min_w = 0.3)
-
 
 
 

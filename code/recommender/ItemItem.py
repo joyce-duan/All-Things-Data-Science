@@ -12,7 +12,6 @@ from time import time
 from sklearn.metrics.pairwise import linear_kernel
 import pickle
 
-
 class ItemItemRec(object):
     '''
     Item based collaborative filtering
@@ -136,7 +135,6 @@ class ItemItemRec(object):
         unrated_items_by_pred_rating = [item for item in item_index_sorted_by_pred_rating
                                         if item not in items_rated_by_this_user]
         return unrated_items_by_pred_rating[-n:]
-
 
 def get_ratings_data():
     '''

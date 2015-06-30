@@ -1,12 +1,11 @@
 '''
-to-do:  NMF components = 40 gives 20 topics????
-NMF mixing up articles and topics???
+class TopicModel
+to fit, load, transform, summarize
 '''
 
 from configobj import ConfigObj
 config=ConfigObj('allds.config')
-#config = ConfigObj('../../allds.config')
-#print config
+
 allds_home = config.get('allDS_home','/Users/joyceduan/Documents/git/All-Things-Data-Science/')
 data_home = allds_home + 'data/'
 
@@ -140,10 +139,8 @@ class TopicModel(object):
         except:
             print '!!!!error loading file %s' % topics_fname
 
-
         t1 = time.time() # time it
         print "finished in  %4.4fmin in %s " %((t1-t0)/60,'load_model')
-
 
     def transform_bodytext2topics(self,docs, flag_print_time = 0):
         '''
@@ -194,23 +191,7 @@ class TopicModel(object):
         self.idx_in_model = irows
 
         url_list2 = self.df['url']
-        #df2.head(2)
-        '''
-        print 'after filtering:'
-        print len(url_list2)
-        print self.df.shape
-        print self.X2.shape
-
-        print self.df['uri'].nunique()
-        print pd.value_counts(self.df['uri'])[:15]
-        print 1.0 *pd.value_counts(self.df['uri'])[:8].sum()/self.df.shape[0]
-        print self.df.uri.nunique()
-
-        print self.df.shape
-        print self.df.columns
-        '''
-        #print self.df.head(2)
-
+       
     def fit_analyze_nmf(self):
         '''
         fit NMF
@@ -267,10 +248,7 @@ class TopicModel(object):
         sorted_idx_topics = np.argsort(W, axis= 1)
         sorted_topics_all = []
         for i_article in xrange(W.shape[0]):
-            #idx_topics_desc = (sorted_idx_topics[i_article,:].getA()).flatten()[::-1]
             idx_topics_desc = (sorted_idx_topics[i_article,:]).flatten()[::-1]
-            #print type(idx_topics_desc), idx_topics_desc.shape
-            #print idx_topics_desc
             sorted_topics_this = [(i_topic, topic_names[i_topic], W[i_article,i_topic]) for i_topic in idx_topics_desc]
             sorted_topics_all.append(sorted_topics_this)
         return sorted_topics_all
@@ -418,8 +396,6 @@ class TopicModel(object):
         fig.savefig(self.model_name+'_hist_dis_to_centroid.png')
         plt.close(fig)
 
-
-
 def plot_mds(data_m, title, distance_metric):
     '''
     takes ~60minuts on 1500 x 6000
@@ -440,10 +416,8 @@ def plot_mds(data_m, title, distance_metric):
     plt.title(title)
     plt.show()
 
-
 def read_articles():  
     '''
-    ??? should this be moved to preprocess module
     read all articles as dataframe from mongodb collection 'articles'
         - INPUT: None
         - OUTPUT: df.   columns: title, url, uri, body_text, 
@@ -492,7 +466,7 @@ def tune_hyper_params():
 
     '''
     nmx_max_iter= 6000 # 3000
-    '''
+    
     model_name = 'run3_4'   # 3 snow  
     kw_tfidf = {'max_df': 0.99, 'stop_words': 'english', 'min_df': 10,\
                  'ngram_range':(1,3)}                
@@ -501,7 +475,7 @@ def tune_hyper_params():
     func_stemmer = SnowballStemmer('english')
     func_tokenizer = word_tokenize
     run_model(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer)   
-    '''
+    
     model_name = 'run3_5'
     kw_tfidf = {'max_df': 0.99, 'stop_words': 'english', 'min_df': 10,\
                  'ngram_range':(1,3)}                
@@ -534,7 +508,6 @@ def tune_hyper_params():
     kw_nmf = {'n_components': 40, 'max_iter': nmx_max_iter}
     run_model(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer)
 
-
     model_name = 'run3_9'
     kw_tfidf = {'max_df': 0.90, 'stop_words': 'english', 'min_df': 10,\
                 'tokenizer': None, 'ngram_range':(1,3)}                
@@ -542,7 +515,6 @@ def tune_hyper_params():
     func_stemmer =  PorterStemmer()
     func_tokenizer = TfidfVectorizer(stop_words = 'english').build_tokenizer()
     run_model(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer)
-
 
 def test_run_modeler():
     '''
@@ -561,11 +533,7 @@ def test_run_modeler():
 
 def test_1_run():
     nmx_max_iter = 6000
-    model_name = 'run3_1'
-    #func_stemmer = PorterStemmer()
-    #func_tokenizer = word_tokenize
-    #kw_tfidf = {'max_df': 0.90, 'stop_words': 'english', 'min_df': 10,\
-    #            'tokenizer': func_tokenizer, 'ngram_range':(1,3)}                
+    model_name = 'run3_1'               
     kw_nmf = {'n_components': 40, 'max_iter': nmx_max_iter}
 
     kw_tfidf = {'stop_words':'english', 'ngram_range':(1,3), 'min_df':10}
@@ -573,7 +541,6 @@ def test_1_run():
     func_stemmer = PorterStemmer()
 
     run_model(model_name, kw_tfidf, kw_nmf, func_stemmer, func_tokenizer)
-
 
 if __name__ == '__main__':
     #test_run_modeler()

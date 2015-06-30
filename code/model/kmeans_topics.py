@@ -62,10 +62,6 @@ def test_run():
 	kmeans_topic_model.set_X2(X2)
 	kmeans_topic_model.plot_hist_d_to_centroid(min_w = 0.0)
 
-
-
-
-
 def run_k_means():
 
 	num_clusters = 20
