@@ -2,10 +2,6 @@
 depreciated; replaced by Datatau.py
 extract urls from datatau and insert into collection links in mongodb atds
 
-to-do:
-1. add command line inputs
-2.  add field triedhtml to flag made html request but failed
-
 mongo db collections data structure:
 links
 	linksource: datatau

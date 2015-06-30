@@ -104,7 +104,6 @@ class TopicModel(object):
             self.nmf_model
 
             self.topic_names  : manul curation
-            self.H: topic x term  # redundant with self.nmf_model?
         '''
         t0 = time.time()
 
@@ -155,7 +154,6 @@ class TopicModel(object):
         t0 = time.time()
         vectorized_X, tokenized_articles = transform_tfidf(
             self.vectorizer, docs, self.func_tokenizer, self.func_stemmer)
-        # W = vectorized_X.dot(self.H.T)????
         W = self.nmf_model.transform(vectorized_X)
         t1 = time.time()  # time it
         if flag_print_time:

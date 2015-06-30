@@ -302,25 +302,13 @@ def read_slack_msgs(func_tokenizer, fname='slack_mod.txt'):
     read and clean slack message as one article
         - OUTPUT: cleaned_slack string
 
-    ??? need a way to ignore the slack line:  Slackdata
     '''
     data_file = '../../data/' + fname
     fileObj = codecs.open(data_file, "r", "utf-8")
     # Returns a Unicode string from the UTF-8 bytes in the file
     data2 = fileObj.read()
-    #data2 = data2.encode('ascii','ignore')
-    #data2 = ' '.join([l for l in data2.split('\n') if 'text/html;charset=utf-8' not in l])
-    # print u
-    '''
-    # this does not work due to utf-8 coding
-    data_file = '../../data/slack.txt'
-    with open(data_file, 'r') as in_fh:
-        data = in_fh.read()
-    data2 = data.decode(('utf8'))
-    '''
+
     return pre_clean_text(func_tokenizer, data2)
-    #test_X, tokenized_slacks = transform_tfidf(vectorizer, [data2])
-    #test_X = test_X.getA().flatten()
 
 
 def pre_clean_text(func_tokenizer, data2):

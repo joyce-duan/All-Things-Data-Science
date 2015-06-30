@@ -127,7 +127,7 @@ class ItemItemRec(object):
         '''
         top n recommendations for user_id
             - INPUT:  
-                user_id: int  (the index?)
+                user_id: int 
                 n: int top n recommendations
             - OUTPUT: 
                 list of n itmes unrated by user_id

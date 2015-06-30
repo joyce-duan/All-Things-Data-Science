@@ -3,9 +3,7 @@ get wayback snapshot of datatau, extract url for articles and store in mongdb
 
     list of snapshots from:
     	https://web.archive.org/web/20140210061922*/http://www.datatau.com/
-to-do:
 
- https://web.archive.orgitem?id=6927 is not handled correctly
 '''
 
 

@@ -13,10 +13,6 @@ request error code:
 	403  forbidden
 	404 not found
 
-to-do:
--1. flag invalid_url 
-1. uri vsl response code error; exclude those with too many errors?
-2. wget seemed to be work with some of these??
 '''
 from get_links import get_mongodb_collections
 from mechanize import Browser

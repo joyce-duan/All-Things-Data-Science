@@ -15,14 +15,6 @@ link_query_default = {'gothtml': {'$exists': 0}}
 dt_field = '&begin_date=20130101&end_date=20150610'
 #query = 'q=data+scientist'
 
-'''
-to-do:
-1. make into class
-2. query input as command line????
-3. for article meta data, if search results have more than 100 pages, roll back date and redo
-4. 
-'''
-
 from get_article import update_scraped, get_articles, single_query
 
 '''
@@ -149,9 +141,6 @@ def get_articles_nytimes(links_collection, articles_collection, link_url_field=l
 
     counter = 0
     counter_inserted = 0
-    # need to dedupe???
-    # links_no_content = list(links_collection.find({'gothtml': {$exists:
-    # false}} ))
 
     #  db.links.find({'gothtml':{$exists:0}}).count()
     #query = {'gothtml':{'$exists': 0}}

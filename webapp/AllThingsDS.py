@@ -1,11 +1,6 @@
 
 '''
-ToDo: ????
-                1. unicode character: copy and paste did not work
-3. check if '\n' entered in the form is handled correctly??
-
-input:  
-
+web app
 
 '''
 
@@ -13,11 +8,6 @@ input:
 to start this
 python AllThingsDS.py
 
-Pre-requisit:
-    from AllThingsDS/
-    -  data/topic_names.csv ????
-    -  data/vectorizer?
-    - H ???
 '''
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
@@ -55,16 +45,7 @@ dummy_result_pkl = 'dummy_results.pkl'
 username = 'DSI6'
 app = Flask(__name__)
 
-my_title = '''<html>
-        <head>
-            <meta charset="utf-8">
-            <title>Article Recommender </title>
-        </head>
-        '''
 sys.stdout.flush()
-# OUR HOME PAGE
-#============================================
-# home page describing the project tbd
 
 
 @app.route('/test')
@@ -77,7 +58,7 @@ def index():
 # Form page to submit text
 #============================================
 # create page with a form on it
-# use as landing page for now.
+# use as landing page 
 
 
 @app.route('/')
@@ -85,11 +66,6 @@ def index():
 def cool_form():
     action = '/recommender_by_content'
     return render_template('form.html', action=action)
-
-# My  app
-#==============================================
-# create the page the form goes to
-
 
 @app.route('/recommender_by_content', methods=['POST'])
 def recommender_by_content():
@@ -189,46 +165,6 @@ def dummy_recom(username, input_name, data):
     with open(dummy_result_pkl, 'r') as in_fh:
         results_dict = pickle.load(in_fh)
     return results_dict
-
-
-def recommender_by_contentold():
-    #username = 'DSI6'
-    model_name = 'v2_2'
-
-    data = request.form['user_input']
-    input_name = 'your_input'
-
-    fname = input_name
-
-    relevant_all = None
-
-    func_tokenizer = TfidfVectorizer(stop_words='english').build_tokenizer()
-    func_stemmer = PorterStemmer()
-
-    # load model
-    t0 = time.time()
-    recommender = Recommender(model_name, func_tokenizer, func_stemmer)
-
-    #read in input
-    cleaned_slack = pre_clean_text(func_tokenizer, data)
-
-    W, tokenized_slacks2, test_X2, top_features_list = recommender.process_input(
-        cleaned_slack)
-    sorted_topics = recommender.topic_model.sorted_topics_for_articles(W)
-
-    print 'input name: %s' % input_name
-    # recommendations
-    print '--------------- recommendations --------------'
-    df_recom = recommender.calculate_recommendations(W, test_X2, fname)
-    print sorted_topics
-    t1 = time.time()
-    print "finished in  %4.4f min %s " % ((t1 - t0) / 60, 'finished all processing\n')
-
-    return render_template('recom_by_content.html', username=username,
-                           input_data=data, input_name=input_name, sorted_topics=sorted_topics,
-                           idx=range(df_recom.shape[0]),
-                           df_recom=df_recom, relevant_all=relevant_all)
-
 
 @app.route('/recommender_by_ratings')
 def recommender_by_ratings():
