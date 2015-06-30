@@ -3,7 +3,7 @@ data/  data files (models) used by both web app and analysis code
 code/   analysis and modeling
 webapp/
 
-----  to set up configuration:
+---  to set up configuration:
 
 cd All-Things-Data-Science
 vi allds.config

@@ -8,6 +8,8 @@ from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 from cStringIO import StringIO
 import os
+
+
 def convert_pdf_to_txt(path):
     rsrcmgr = PDFResourceManager()
     retstr = StringIO()
@@ -19,8 +21,8 @@ def convert_pdf_to_txt(path):
     password = ""
     maxpages = 0
     caching = True
-    pagenos=set()
-    for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password,caching=caching, check_extractable=True):
+    pagenos = set()
+    for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password, caching=caching, check_extractable=True):
         interpreter.process_page(page)
     fp.close()
     device.close()
@@ -38,6 +40,6 @@ if __name__ == '__main__':
             fname_full = mydirectory + fname
             print fname_full
             txt = convert_pdf_to_txt(fname_full)
-            out_fname = fname.replace('.pdf','.txt')
+            out_fname = fname.replace('.pdf', '.txt')
             with open(out_fname, 'w') as out_fh:
-                out_fh.write(txt+"\n")
+                out_fh.write(txt + "\n")

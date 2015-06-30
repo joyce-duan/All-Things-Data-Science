@@ -12,6 +12,7 @@ import re
 from httplib import BadStatusLine
 from boilerpipe.extract import Extractor
 
+
 def clean_articles(cur_articles, articles_cleaned):
     '''
     read articles from mongodb and save in dictionary 
@@ -29,50 +30,53 @@ def clean_articles(cur_articles, articles_cleaned):
     print '%d articles found' % len(articles)
     counter = 0
     for a in articles:
-    #for a in cur_articles:
+        # for a in cur_articles:
         url = a['url']
         url = url.strip()
-        # exclude 
-        if url[-4:] == '.pdf' or 'https://www.youtube.com/watch?' in url :
+        # exclude
+        if url[-4:] == '.pdf' or 'https://www.youtube.com/watch?' in url:
             pass
         else:
             if 'web.archive.org' in url:
-                    url = '/'.join(re.split('\d{8}',url)[1].split('/')[1:])
-                    url = url.strip()
+                url = '/'.join(re.split('\d{8}', url)[1].split('/')[1:])
+                url = url.strip()
             body_text = a['body_text']
             l = len(body_text)
             # for duplicate urls, use the one with longer length
-            if l > articles_cleaned.get(url,[0])[0]:
-                articles_cleaned[url] = [len(body_text),body_text]
+            if l > articles_cleaned.get(url, [0])[0]:
+                articles_cleaned[url] = [len(body_text), body_text]
+
 
 def tokenize(doc, func_tokenizer, func_stemmer):
-        '''
-        Tokenize and stem/lemmatize the document.
-            - INPUT: string
-            - OUTPUT: list of strings
-        '''
+    '''
+    Tokenize and stem/lemmatize the document.
+        - INPUT: string
+        - OUTPUT: list of strings
+    '''
 
-        #sklearn_tokenizer = TfidfVectorizer(stop_words = 'english').build_tokenizer()
+    #sklearn_tokenizer = TfidfVectorizer(stop_words = 'english').build_tokenizer()
 
-        #snowball = SnowballStemmer('english')
-        #print type(doc), type([snowball.stem(word) for word in word_tokenize(doc.lower())])
-        #print len(doc), len([snowball.stem(word) for word in word_tokenize(doc.lower())])
-        words = []
-        func = func_tokenizer
-        if func_tokenizer == None:
-            func = TfidfVectorizer(stop_words = 'english').build_tokenizer()
-        #for word in word_tokenize(doc.strip().lower()):
-        for word in func(doc.strip().lower()):
-            try:
+    #snowball = SnowballStemmer('english')
+    # print type(doc), type([snowball.stem(word) for word in word_tokenize(doc.lower())])
+    # print len(doc), len([snowball.stem(word) for word in
+    # word_tokenize(doc.lower())])
+    words = []
+    func = func_tokenizer
+    if func_tokenizer == None:
+        func = TfidfVectorizer(stop_words='english').build_tokenizer()
+    # for word in word_tokenize(doc.strip().lower()):
+    for word in func(doc.strip().lower()):
+        try:
                 # .decode('utf-8'
-                t = word.encode('ascii', 'ignore')
+            t = word.encode('ascii', 'ignore')
 
-                if re.search('[a-zA-Z]+',t):
-                    words.append(t)                
-            except:
-                 t = ''
-        stemmed_word = [func_stemmer.stem(word) for word in words ]
-        return [w for w in stemmed_word if len(w) >=3 ]
+            if re.search('[a-zA-Z]+', t):
+                words.append(t)
+        except:
+            t = ''
+    stemmed_word = [func_stemmer.stem(word) for word in words]
+    return [w for w in stemmed_word if len(w) >= 3]
+
 
 def keep_word(word):
     word = word.strip()
@@ -88,6 +92,7 @@ def keep_word(word):
     else:
         return True
 
+
 def normalize_doc(docs):
     '''
     exclude url links, and stop words
@@ -95,11 +100,12 @@ def normalize_doc(docs):
     docs_new = []
     for doc in docs:
         doc = doc.strip().lower()
-        words = re.split("(\s+)", doc) 
-        #print words
+        words = re.split("(\s+)", doc)
+        # print words
         words_new = [w.strip() for w in words if keep_word(w)]
         docs_new.append(' '.join(words_new))
     return docs_new
+
 
 def fit_tfidf(docs, kw_tfidf, func_tokenizer, func_stemmer):
     '''
@@ -107,31 +113,35 @@ def fit_tfidf(docs, kw_tfidf, func_tokenizer, func_stemmer):
         - OUPUT: list of list
     '''
     docs = normalize_doc(docs)
-    tokenized_articles = [tokenize(doc, func_tokenizer, func_stemmer) for doc in docs]
+    tokenized_articles = [
+        tokenize(doc, func_tokenizer, func_stemmer) for doc in docs]
 
+    # vectorizer = TfidfVectorizer(stop_words = 'english', min_df= 0.01) #v1 max_features = 5000)
+    # vectorizer = TfidfVectorizer(stop_words = 'english', ngram_range= (1,3),
+    # min_df= 5)   #v2
 
-    #vectorizer = TfidfVectorizer(stop_words = 'english', min_df= 0.01) #v1 max_features = 5000)
-    #vectorizer = TfidfVectorizer(stop_words = 'english', ngram_range= (1,3), min_df= 5)   #v2
+    vectorizer = TfidfVectorizer(**kw_tfidf)  # v2
 
-    vectorizer = TfidfVectorizer(**kw_tfidf)   #v2
-   
     documents = [' '.join(article) for article in tokenized_articles]
-    vectorizer =  vectorizer.fit(documents)
+    vectorizer = vectorizer.fit(documents)
 
     #vectors_doc = vectorizer.transform(documents).todense()
     vectors_doc = vectorizer.transform(documents)
     return vectorizer, vectors_doc, tokenized_articles
 
-def transform_tfidf(vectorizer, docs, func_tokenizer,func_stemmer):
+
+def transform_tfidf(vectorizer, docs, func_tokenizer, func_stemmer):
     '''
     transform text to tfidf
         - INPUT:  list of string :  (string / text)
         - OUTOUT: list of float
     '''
-    tokenized_articles = [tokenize(doc, func_tokenizer, func_stemmer) for doc in docs]
+    tokenized_articles = [
+        tokenize(doc, func_tokenizer, func_stemmer) for doc in docs]
     documents = [' '.join(article) for article in tokenized_articles]
-    #return vectorizer.transform(documents).todense(), tokenized_articles
+    # return vectorizer.transform(documents).todense(), tokenized_articles
     return vectorizer.transform(documents), tokenized_articles
+
 
 def format_article(i, df2):
     n_chars = 500
@@ -140,6 +150,7 @@ def format_article(i, df2):
     s = s + '\n\n' + df2.iloc[i]['body_text'][:n_chars]
     return s
 
+
 def print_articles(idx, df2, scores):
     '''
     print list of articles and associated scores
@@ -147,7 +158,8 @@ def print_articles(idx, df2, scores):
     for i in idx:
         str_article = format_article(i, df2)
         print '%d %.2f %s ' % (i, scores[i], str_article)
-        print 
+        print
+
 
 def print_articles_2scores(idx, df2, sim, rating):
     '''
@@ -155,8 +167,9 @@ def print_articles_2scores(idx, df2, sim, rating):
     '''
     for i in idx:
         str_article = format_article(i, df2)
-        print '%d sim: %.2f rating: %.2f %s ' % (i, sim[i],rating[i], str_article)
-        print 
+        print '%d sim: %.2f rating: %.2f %s ' % (i, sim[i], rating[i], str_article)
+        print
+
 
 def ascii_text(text):
     '''
@@ -168,9 +181,10 @@ def ascii_text(text):
         try:
             t = w.encode('ascii', 'ignore')
         except:
-             t = ''
+            t = ''
         cleaned_words.append(t)
     return ' '.join(cleaned_words)
+
 
 def html_to_bodytext(raw_html):
     '''
@@ -188,4 +202,3 @@ def html_to_bodytext(raw_html):
     except BadStatusLine:
         print("could not extract body_text ")
     return extracted_text
-
