@@ -1,4 +1,4 @@
-# [All-Things-Data-Science] (http://www.allthingsds.com/): Article Finder
+# All-Things-Data-Science: Article Finder
 
 ### Joyce Duan
 
@@ -32,7 +32,7 @@ The pipeline includes the following steps:
 I tested different tokenizers, stemmers, n-gram ranging from 1 to 5, and number of topics from 20 to 40. The results were manually reviewed to check if topics were distinct and articles with highest weights under each topic shared similar contents. The combination with the most intuitive and sensible results was used in the final model.
 
 ##Final Output
-[The web app] (http://www.allthingsds.com/), allows users to browse topics, search for articles, and explore visualization of trends by each topic.
+The web app, allows users to browse topics, search for articles, and explore visualization of trends by each topic.
 
 ##Next Steps
 * Add daily feed of newly published articles
